@@ -2,14 +2,14 @@ import { getPrivateEncryptionKey } from "./keyManager";
 import { toArrayBuffer, toBase64 } from "./utils";
 
 export async function getSharedEncryptionKey(
-    rawOtherPublicKey: string,
+    otherRawPublicKey: string,
     roomId: string
 ) {
     const privateKey = await getPrivateEncryptionKey();
 
     const otherPublicKey = await crypto.subtle.importKey(
         "raw",
-        toArrayBuffer(rawOtherPublicKey),
+        toArrayBuffer(otherRawPublicKey),
         {
             name: "ECDH",
             namedCurve: "P-256",

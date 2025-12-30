@@ -20,7 +20,7 @@ export const messages = new Elysia({ prefix: "/messages" })
                 userId,
             };
 
-            const stream = createWebsocketStream();
+            const stream = await createWebsocketStream();
 
             const { createdAt, id } = await createMessage(message);
 

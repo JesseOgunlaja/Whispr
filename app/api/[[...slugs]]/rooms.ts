@@ -11,6 +11,7 @@ import { isLikelyBase64Key, nanoid } from "@/lib/lib";
 import { ratelimit, roomRatelimit } from "@/lib/ratelimit";
 import { createWebsocketStream } from "@/lib/server-lib";
 import { Elysia, t } from "elysia";
+import { after } from "next/server";
 import { AuthError, isUserAuthorized, loadRoom, loadUser } from "./auth";
 
 export const rooms = new Elysia({ prefix: "/room" })
@@ -53,22 +54,16 @@ export const rooms = new Elysia({ prefix: "/room" })
                 },
             });
 
+            after(async () => {
+                await kv.zadd(EXPIRY_LIST_KEY, {
+                    score: Date.now() + ROOM_TTL_MINUTES * 60 * 1000,
+                    member: roomId,
+                });
+            });
+
             return { success: true, roomId };
         },
         {
-            async afterResponse({ responseValue }) {
-                if (
-                    typeof responseValue == "object" &&
-                    responseValue &&
-                    "roomId" in responseValue
-                ) {
-                    const { roomId } = responseValue as { roomId: string };
-                    await kv.zadd(EXPIRY_LIST_KEY, {
-                        score: Date.now() + ROOM_TTL_MINUTES * 60 * 1000,
-                        member: roomId,
-                    });
-                }
-            },
             body: t.Object({
                 encryptionKey: t.String(),
                 signingKey: t.String(),
@@ -105,7 +100,7 @@ export const rooms = new Elysia({ prefix: "/room" })
                 room.id
             );
 
-            const stream = createWebsocketStream();
+            const stream = await createWebsocketStream();
             stream.send(
                 room.id,
                 "user-joined",
@@ -125,18 +120,16 @@ export const rooms = new Elysia({ prefix: "/room" })
     .get("/:roomId", async ({ room, userId }) => {
         return { success: true, room, userId };
     })
-    .post(
-        "/destroy/:roomId",
-        async ({ room }) => {
-            await deleteRoom(room.id);
-            return { success: true };
-        },
-        {
-            async afterResponse({ room, userId }) {
-                const stream = createWebsocketStream();
-                stream.send(room.id, "room-destroyed", userId);
+    .post("/destroy/:roomId", async ({ room, userId }) => {
+        await deleteRoom(room.id);
 
-                await kv.zrem(EXPIRY_LIST_KEY, room.id);
-            },
-        }
-    );
+        after(async () => {
+            const [stream] = await Promise.all([
+                createWebsocketStream(),
+                kv.zrem(EXPIRY_LIST_KEY, room.id),
+            ]);
+            stream.send(room.id, "room-destroyed", userId);
+        });
+
+        return { success: true };
+    });

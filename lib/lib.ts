@@ -3,9 +3,10 @@ import { treaty } from "@elysiajs/eden";
 import { formatDistanceToNow } from "date-fns";
 import { customAlphabet } from "nanoid";
 import { toast } from "sonner";
-import { env } from "./env";
 
-export const api = treaty<App>(env.NEXT_PUBLIC_BASE_URL).api;
+export const api = treaty<App>(
+    typeof window !== "undefined" ? window.location.origin : ""
+).api;
 
 export function promiseToast(
     promise: Promise<{ message: string }>,

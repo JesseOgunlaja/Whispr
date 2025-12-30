@@ -1,6 +1,5 @@
 import PublicKeysProvider from "@/app/_components/PublicKeysProvider";
 import QueryProvider from "@/app/_components/QueryProvider";
-import { env } from "@/lib/env";
 import { ChildrenProps } from "@/lib/types";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
@@ -17,7 +16,7 @@ export const metadata: Metadata = {
     title: "Whispr",
     description:
         "An end-to-end encrypted anonymous chat app with self-destructing chats",
-    metadataBase: new URL(env.NEXT_PUBLIC_BASE_URL),
+    metadataBase: new URL("https://whispr.jesseogu.dev"),
     authors: [
         {
             name: "Jesse Ogunlaja",

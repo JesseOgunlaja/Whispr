@@ -1,6 +1,5 @@
 "use client";
 
-import { env } from "@/lib/env";
 import { useEffect, useState } from "react";
 import { useRoomId } from "../_hooks/useRoomId";
 
@@ -10,7 +9,7 @@ export default function RoomID() {
 
     function copyRoomId() {
         navigator.clipboard.writeText(
-            `${env.NEXT_PUBLIC_BASE_URL}/room/${roomId}`
+            `${window.location.origin}/room/${roomId}`
         );
 
         setCopied(true);

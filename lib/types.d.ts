@@ -19,3 +19,8 @@ export type IDBKey = CryptoKey | null;
 export type ChildrenProps = Readonly<{
     children: React.ReactNode;
 }>;
+
+export type Signature = {
+    signature: string;
+    window: string;
+};

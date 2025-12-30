@@ -5,6 +5,7 @@ import { Room } from "@/lib/db/schema";
 import { ChildrenProps, DecryptedMessage } from "@/lib/types";
 import { createContext } from "react";
 import { useOptimisticMessages } from "../_hooks/useOptimisticMessages";
+import { useRealtime } from "../_hooks/useRealtime";
 import { useRoomSessionData } from "../_hooks/useRoomSessionData";
 import { useSharedKey } from "../_hooks/useSharedKey";
 import { useSignature } from "../_hooks/useSignature";
@@ -35,6 +36,8 @@ export default function RoomSessionProvider({ children }: ChildrenProps) {
     const roomSession = useRoomSessionData(signature);
     const sharedKey = useSharedKey(roomSession.room, roomSession.userId);
     const optimisticMessagesController = useOptimisticMessages(roomSession);
+
+    useRealtime(roomSession.userId, signature);
 
     return (
         <RoomSessionContext.Provider

@@ -1,23 +1,24 @@
 import { Message } from "@/lib/db/schema";
 import { env } from "@/lib/env";
 import { api } from "@/lib/lib";
-import { RoomQueryData } from "@/lib/types";
+import { RoomQueryData, Signature } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { produce } from "immer";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { ClientStream, createClientStream } from "streamthing";
-import { useRoomSession } from "../_components/RoomSessionProvider";
-import { useEffectOnceDefined } from "./useEffectOnceDefined";
 import { useRoomId } from "./useRoomId";
 
-export function useRealtime() {
+export function useRealtime(
+    userId: string | undefined,
+    signature: Signature | undefined
+) {
     const roomId = useRoomId();
     const router = useRouter();
     const queryClient = useQueryClient();
-    const { userId, signature } = useRoomSession();
 
-    useEffectOnceDefined(() => {
+    useEffect(() => {
         if (!userId || !signature || !roomId) return;
 
         let stream: ClientStream | null = null;

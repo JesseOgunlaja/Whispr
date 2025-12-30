@@ -5,10 +5,10 @@ import { RoomQueryData } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { produce } from "immer";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { toast } from "sonner";
 import { ClientStream, createClientStream } from "streamthing";
 import { useRoomSession } from "../_components/RoomSessionProvider";
+import { useEffectOnDefined } from "./useEffectOnDefined";
 import { useRoomId } from "./useRoomId";
 
 export function useRealtime() {
@@ -17,7 +17,7 @@ export function useRealtime() {
     const queryClient = useQueryClient();
     const { userId, signature } = useRoomSession();
 
-    useEffect(() => {
+    useEffectOnDefined(() => {
         if (!userId || !signature || !roomId) return;
 
         let stream: ClientStream | null = null;
@@ -84,5 +84,5 @@ export function useRealtime() {
             });
 
         return () => stream?.disconnect();
-    }, [userId, router, queryClient, roomId, signature]);
+    }, [userId, roomId, signature]);
 }

@@ -2,7 +2,7 @@
 
 import { useStrictContext } from "@/hooks/useStrictContext";
 import { Room } from "@/lib/db/schema";
-import { DecryptedMessage } from "@/lib/types";
+import { ChildrenProps, DecryptedMessage } from "@/lib/types";
 import { createContext } from "react";
 import { useOptimisticMessages } from "../_hooks/useOptimisticMessages";
 import { useRoomSessionData } from "../_hooks/useRoomSessionData";
@@ -30,7 +30,7 @@ interface RoomSession {
 const RoomSessionContext = createContext<RoomSession | null>(null);
 export const useRoomSession = () => useStrictContext(RoomSessionContext);
 
-export default function RoomSessionProvider({ children }: LayoutPropsType) {
+export default function RoomSessionProvider({ children }: ChildrenProps) {
     const signature = useSignature();
     const roomSession = useRoomSessionData(signature);
     const sharedKey = useSharedKey(roomSession.room, roomSession.userId);

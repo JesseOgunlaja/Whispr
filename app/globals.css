@@ -1,42 +1,56 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 * {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif !important;
+}
+
+:root {
+    --accent-color: rgb(0, 140, 255);
+    --font-color: #8f8f8f;
+
+    --shadow-top-left: inset 0.5px 0.5px 2px #ffffff30, -4px -4px 8px #00000030,
+        -8px -8px 16px #00000015;
+
+    --shadow-bottom-right: inset -0.5px -0.5px 2px #ffffff30,
+        4px 4px 8px #00000030, 8px 8px 16px #00000015;
+}
+
+body {
+    background: #090909;
+    overflow-x: hidden !important;
+    color: var(--font-color) !important;
+}
+
+a,
+button,
+input {
+    box-shadow: var(--shadow-top-left);
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+    color: var(--font-color) !important;
+    text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+ul {
+    list-style: none;
+}
+
+:disabled {
+    cursor: not-allowed;
+}
+
+*::-webkit-scrollbar {
+    width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+    margin: 5px 20px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 5px;
 }

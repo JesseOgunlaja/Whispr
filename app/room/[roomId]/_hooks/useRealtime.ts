@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ClientStream, createClientStream } from "streamthing";
 import { useRoomSession } from "../_components/RoomSessionProvider";
-import { useEffectOnDefined } from "./useEffectOnDefined";
+import { useEffectOnceDefined } from "./useEffectOnceDefined";
 import { useRoomId } from "./useRoomId";
 
 export function useRealtime() {
@@ -17,7 +17,7 @@ export function useRealtime() {
     const queryClient = useQueryClient();
     const { userId, signature } = useRoomSession();
 
-    useEffectOnDefined(() => {
+    useEffectOnceDefined(() => {
         if (!userId || !signature || !roomId) return;
 
         let stream: ClientStream | null = null;

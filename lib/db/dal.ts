@@ -26,8 +26,8 @@ export async function createMessage(
     )[0];
 }
 
-export async function updateRoom(room: Partial<Room>) {
-    return await db.update(rooms).set(room);
+export async function updateRoom(room: Partial<Room>, roomId: string) {
+    return await db.update(rooms).set(room).where(eq(rooms.id, roomId));
 }
 
 export async function deleteExpiredRooms() {

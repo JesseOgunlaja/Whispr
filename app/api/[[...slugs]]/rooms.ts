@@ -97,10 +97,13 @@ export const rooms = new Elysia({ prefix: "/room" })
                 encryptionKey,
                 signingKey,
             };
-            await updateRoom({
-                users: room.users,
-                publicKeys: room.publicKeys,
-            });
+            await updateRoom(
+                {
+                    users: room.users,
+                    publicKeys: room.publicKeys,
+                },
+                room.id
+            );
 
             const stream = createWebsocketStream();
             stream.send(

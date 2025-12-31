@@ -101,19 +101,6 @@
     }
 }
 
-@keyframes overflow {
-    100% {
-        overflow-y: auto;
-    }
-}
-
-@keyframes scrolling {
-    0%,
-    to {
-        padding-right: 10px;
-    }
-}
-
 .aside {
     box-shadow: var(--shadow-bottom-right);
     padding: 10px 20px;
@@ -125,8 +112,10 @@
         }
         ul {
             max-height: 150px;
-            animation: scrolling forwards scroll(self),
-                overflow 0s 1.5s forwards;
+            &:has(li:nth-child(3)) {
+                overflow: auto;
+                padding-right: 10px;
+            }
         }
     }
 
@@ -135,7 +124,6 @@
     }
 
     & ul {
-        animation: scrolling forwards scroll(self);
         transition: max-height 1.5s cubic-bezier(0.16, 1, 0.3, 1);
         overflow-y: hidden;
         max-height: 0;

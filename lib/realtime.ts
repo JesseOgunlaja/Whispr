@@ -1,7 +1,7 @@
 import { produce } from "immer";
 import { toast } from "sonner";
 import { Message } from "./db/schema";
-import { RealtimeHandler, RoomQueryData } from "./types";
+import { RealtimeHandler, RoomQueryData, RoomsQueryData } from "./types";
 
 export const handlers = {
     "user-joined": (data, { userId, roomId, queryClient }) => {
@@ -25,7 +25,15 @@ export const handlers = {
             });
         });
     },
-    "room-destroyed": (_, { router }) => {
+    "room-destroyed": (_, { router, queryClient, roomId }) => {
+        queryClient.setQueryData(["rooms"], (old: RoomsQueryData) => {
+            if (!old.data) return old;
+            return produce(old, (draft) => {
+                draft.data.rooms = draft.data.rooms.filter(
+                    (room) => room.id !== roomId
+                );
+            });
+        });
         router.push("/?info=Room destroyed");
     },
     "new-message": (data, { roomId, queryClient }) => {

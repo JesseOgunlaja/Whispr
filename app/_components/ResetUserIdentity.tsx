@@ -39,6 +39,7 @@ export default function ResetUserIdentity() {
             className={isRefreshing ? styles.refreshing : ""}
         >
             <RefreshCw />
+            <span id="sr-only">Reset identity</span>
         </button>
     );
 }

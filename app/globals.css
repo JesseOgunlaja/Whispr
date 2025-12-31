@@ -17,6 +17,10 @@
         4px 4px 8px #00000030, 8px 8px 16px #00000015;
 }
 
+#sr-only {
+    display: none;
+}
+
 body {
     background: #090909;
     overflow-x: hidden !important;

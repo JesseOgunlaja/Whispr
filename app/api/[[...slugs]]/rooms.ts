@@ -16,7 +16,7 @@ import { after } from "next/server";
 import { AuthError, isUserAuthorized, loadRoom, loadUser } from "./auth";
 
 export const rooms = new Elysia({ prefix: "/room" })
-    .get(
+    .post(
         "/cleanup",
         async ({ headers }) => {
             if (headers.authorization !== env.API_TOKEN) {

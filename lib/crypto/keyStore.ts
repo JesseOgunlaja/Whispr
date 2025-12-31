@@ -6,7 +6,7 @@ export async function loadPublicSigningKey() {
     const db = await getDB();
     const publicKey = (await db.get("signing-keys", "public")) as IDBKey;
 
-    return publicKey ? await extractPublicKey(publicKey) : null;
+    return publicKey && (await extractPublicKey(publicKey));
 }
 
 export async function loadPrivateSigningKey() {
@@ -29,7 +29,7 @@ export async function loadPublicEncryptionKey() {
     const db = await getDB();
     const publicKey = (await db.get("encryption-keys", "public")) as IDBKey;
 
-    return publicKey ? await extractPublicKey(publicKey) : null;
+    return publicKey && (await extractPublicKey(publicKey));
 }
 
 export async function loadPrivateEncryptionKey() {

@@ -24,3 +24,13 @@ export type Signature = {
     signature: string;
     window: string;
 };
+
+export type RealtimeHandler = (
+    payload: string,
+    ctx: {
+        userId: string;
+        roomId: string;
+        queryClient: QueryClient;
+        router: AppRouterInstance;
+    }
+) => void;

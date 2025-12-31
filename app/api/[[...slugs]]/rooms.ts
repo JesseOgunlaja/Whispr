@@ -7,6 +7,7 @@ import {
     updateRoom,
 } from "@/lib/db/dal";
 import { kv } from "@/lib/db/db";
+import { env } from "@/lib/env";
 import { isLikelyBase64Key, nanoid } from "@/lib/lib";
 import { ratelimit, roomRatelimit } from "@/lib/ratelimit";
 import { createWebsocketStream } from "@/lib/server-lib";
@@ -15,25 +16,35 @@ import { after } from "next/server";
 import { AuthError, isUserAuthorized, loadRoom, loadUser } from "./auth";
 
 export const rooms = new Elysia({ prefix: "/room" })
-    .get("/cleanup", async () => {
-        const expiredRooms = await kv.zrange<string[]>(
-            EXPIRY_LIST_KEY,
-            0,
-            Date.now(),
-            { byScore: true }
-        );
+    .get(
+        "/cleanup",
+        async ({ headers }) => {
+            if (headers.authorization !== env.API_TOKEN)
+                throw new AuthError("Unauthorized");
+            const expiredRooms = await kv.zrange<string[]>(
+                EXPIRY_LIST_KEY,
+                0,
+                Date.now(),
+                { byScore: true }
+            );
 
-        if (expiredRooms.length === 0) return { success: true, cleaned: 0 };
+            if (expiredRooms.length === 0) return { success: true, cleaned: 0 };
 
-        const pipeline = kv.pipeline();
-        expiredRooms.forEach((roomId) =>
-            pipeline.zrem(EXPIRY_LIST_KEY, roomId)
-        );
+            const pipeline = kv.pipeline();
+            expiredRooms.forEach((roomId) =>
+                pipeline.zrem(EXPIRY_LIST_KEY, roomId)
+            );
 
-        await Promise.all([pipeline.exec(), deleteExpiredRooms()]);
+            await Promise.all([pipeline.exec(), deleteExpiredRooms()]);
 
-        return { success: true, cleaned: expiredRooms.length };
-    })
+            return { success: true, cleaned: expiredRooms.length };
+        },
+        {
+            headers: t.Object({
+                authorization: t.String(),
+            }),
+        }
+    )
     .use(loadUser)
     .post(
         "/create",

@@ -19,8 +19,10 @@ export const rooms = new Elysia({ prefix: "/room" })
     .get(
         "/cleanup",
         async ({ headers }) => {
-            if (headers.authorization !== env.API_TOKEN)
+            if (headers.authorization !== env.API_TOKEN) {
                 throw new AuthError("Unauthorized");
+            }
+
             const expiredRooms = await kv.zrange<string[]>(
                 EXPIRY_LIST_KEY,
                 0,

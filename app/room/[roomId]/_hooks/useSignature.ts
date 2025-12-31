@@ -8,11 +8,10 @@ export function useSignature() {
     const { signingKey } = usePublicKeys();
 
     const { data } = useQuery({
-        queryKey: ["signature", roomId],
+        queryKey: ["signature", roomId, signingKey],
         queryFn: () => createSignature(roomId!),
         refetchInterval: 55000,
         refetchIntervalInBackground: true,
-        gcTime: 0,
         enabled: !!roomId && !!signingKey,
     });
 

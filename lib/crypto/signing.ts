@@ -20,7 +20,10 @@ export async function verifySignature(
 ) {
     const nowWindow = Math.floor(Date.now() / (60 * 1000));
 
-    if (Math.abs(nowWindow - Number(window)) > 1) return false;
+    if (Math.abs(nowWindow - Number(window)) > 1) {
+        console.error("Signature window mismatch");
+        return false;
+    }
 
     const publicKey = await crypto.subtle.importKey(
         "raw",

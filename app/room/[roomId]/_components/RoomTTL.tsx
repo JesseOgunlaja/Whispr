@@ -12,9 +12,16 @@ export default function RoomTTL() {
     const { room } = useRoomSession();
 
     useEffect(() => {
-        if (!room) return;
+        function onFocus() {
+            if (!room) return;
+            setTTL(Math.floor((room.expiredAt.getTime() - Date.now()) / 1000));
+        }
 
-        setTTL(Math.floor((room.expiredAt.getTime() - Date.now()) / 1000));
+        window.addEventListener("focus", onFocus);
+
+        return () => {
+            window.removeEventListener("focus", onFocus);
+        };
     }, [room]);
 
     useEffect(() => {

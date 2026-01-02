@@ -1,13 +1,4 @@
-import { ROOM_TTL_MINUTES } from "@/lib/constants";
-import {
-    createRoom,
-    deleteExpiredRooms,
-    deleteRoom,
-    EXPIRY_LIST_KEY,
-    updateRoom,
-} from "@/lib/db/dal";
-import { kv } from "@/lib/db/db";
-import { env } from "@/lib/env";
+import { createRoom, deleteRoom, updateRoom } from "@/lib/db/dal";
 import { isLikelyBase64Key, nanoid } from "@/lib/lib";
 import { ratelimit, roomRatelimit } from "@/lib/ratelimit";
 import { createWebsocketStream } from "@/lib/server-lib";
@@ -16,37 +7,6 @@ import { after } from "next/server";
 import { AuthError, isUserAuthorized, loadRoom, loadUser } from "./auth";
 
 export const rooms = new Elysia({ prefix: "/room" })
-    .post(
-        "/cleanup",
-        async ({ headers }) => {
-            if (headers.authorization !== env.API_TOKEN) {
-                throw new AuthError("Unauthorized");
-            }
-
-            const expiredRooms = await kv.zrange<string[]>(
-                EXPIRY_LIST_KEY,
-                0,
-                Date.now(),
-                { byScore: true }
-            );
-
-            if (expiredRooms.length === 0) return { success: true, cleaned: 0 };
-
-            const pipeline = kv.pipeline();
-            expiredRooms.forEach((roomId) =>
-                pipeline.zrem(EXPIRY_LIST_KEY, roomId)
-            );
-
-            await Promise.all([pipeline.exec(), deleteExpiredRooms()]);
-
-            return { success: true, cleaned: expiredRooms.length };
-        },
-        {
-            headers: t.Object({
-                authorization: t.String(),
-            }),
-        }
-    )
     .use(loadUser)
     .post(
         "/create",
@@ -65,13 +25,6 @@ export const rooms = new Elysia({ prefix: "/room" })
                         signingKey,
                     },
                 },
-            });
-
-            after(async () => {
-                await kv.zadd(EXPIRY_LIST_KEY, {
-                    score: Date.now() + ROOM_TTL_MINUTES * 60 * 1000,
-                    member: roomId,
-                });
             });
 
             return { success: true, roomId };
@@ -137,10 +90,7 @@ export const rooms = new Elysia({ prefix: "/room" })
         await deleteRoom(room.id);
 
         after(async () => {
-            const [stream] = await Promise.all([
-                createWebsocketStream(),
-                kv.zrem(EXPIRY_LIST_KEY, room.id),
-            ]);
+            const stream = await createWebsocketStream();
             stream.send(room.id, "room-destroyed", userId);
         });
 

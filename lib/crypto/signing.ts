@@ -12,6 +12,11 @@ export async function createSignature(roomId: string) {
     return { window, signature: toBase64(signature) };
 }
 
+export function validWindow(window: string) {
+    const nowWindow = Math.floor(Date.now() / (60 * 1000));
+    return Math.abs(nowWindow - Number(window)) <= 1;
+}
+
 export async function verifySignature(
     signature: string,
     publicKeyBase64: string,

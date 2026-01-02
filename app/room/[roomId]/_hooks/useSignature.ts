@@ -7,13 +7,15 @@ export function useSignature() {
     const roomId = useRoomId();
     const { signingKey } = usePublicKeys();
 
-    const { data } = useQuery({
+    const { data, isStale } = useQuery({
         queryKey: ["signature", roomId, signingKey],
         queryFn: () => createSignature(roomId!),
         refetchInterval: 55000,
+        refetchOnMount: "always",
+        staleTime: 60000,
         refetchIntervalInBackground: true,
         enabled: !!roomId && !!signingKey,
     });
 
-    return data;
+    return !isStale ? data : undefined;
 }

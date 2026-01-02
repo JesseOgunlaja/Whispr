@@ -29,7 +29,7 @@ class Ratelimit {
         }
 
         if (count > maxRequests) {
-            throw new Error("Too many requests");
+            throw new RatelimitError("Too many requests");
         }
     }
 }

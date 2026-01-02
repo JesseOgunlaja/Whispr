@@ -20,5 +20,6 @@ export default async function proxy(request: NextRequest) {
         });
     }
 
+    response.headers.set("user-id", userId);
     return response;
 }

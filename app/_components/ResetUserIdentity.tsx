@@ -36,7 +36,7 @@ export default function ResetUserIdentity() {
     return (
         <button
             onClick={() => resetIdentity()}
-            className={isRefreshing ? styles.refreshing : ""}
+            {...(isRefreshing ? { className: styles.refreshing } : {})}
         >
             <RefreshCw />
             <span id="sr-only">Reset identity</span>

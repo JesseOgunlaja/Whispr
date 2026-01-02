@@ -1,10 +1,17 @@
-import { neon } from "@neondatabase/serverless";
-import { Redis } from "@upstash/redis";
-import { drizzle } from "drizzle-orm/neon-http";
+import { drizzle } from "drizzle-orm/node-postgres";
+import ioredis from "ioredis";
+import { Pool } from "pg";
 import { env } from "../env";
 import * as schema from "./schema";
 
-const sql = neon(env.DATABASE_URL);
-export const db = drizzle(sql, { schema });
+const pool = new Pool({
+    connectionString: env.DATABASE_URL,
+});
 
-export const kv = Redis.fromEnv();
+export const db = drizzle(pool, { schema });
+
+export const redis = new ioredis({
+    host: "redis",
+    port: 6379,
+    password: env.REDIS_PASSWORD,
+});

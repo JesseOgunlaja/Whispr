@@ -3,8 +3,6 @@ services:
         image: ghcr.io/jesseogunlaja/whispr:latest
         environment:
             - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
-            - NEXT_PUBLIC_STREAMTHING_SERVER_REGION=${NEXT_PUBLIC_STREAMTHING_SERVER_REGION}
-            - NEXT_PUBLIC_STREAMTHING_SERVER_ID=${NEXT_PUBLIC_STREAMTHING_SERVER_ID}
             - JWT_SIGNING_KEY=${JWT_SIGNING_KEY}
             - REDIS_PASSWORD=${REDIS_PASSWORD}
             - STREAMTHING_SERVER_PASSWORD=${STREAMTHING_SERVER_PASSWORD}

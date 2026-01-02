@@ -5,7 +5,6 @@ export interface DecryptedMessage extends Message {
     content: string;
 }
 
-export type RoomsQueryData = Awaited<ReturnType<typeof api.user.rooms.get>>;
 export type RoomQueryData = Awaited<
     ReturnType<ReturnType<typeof api.room>["get"]>
 >;

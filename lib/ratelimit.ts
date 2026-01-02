@@ -1,6 +1,5 @@
-import { Ratelimit } from "@upstash/ratelimit";
 import { ParseError } from "elysia";
-import { kv } from "./db/db";
+import { redis } from "./db/db";
 import { getClientIp } from "./server-lib";
 
 export class RatelimitError extends Error {
@@ -10,21 +9,46 @@ export class RatelimitError extends Error {
     }
 }
 
+class Ratelimit {
+    constructor(
+        public config: {
+            time: number;
+            maxRequests: number;
+            prefix: string;
+        }
+    ) {}
+
+    async limit(key: string) {
+        const { time, maxRequests, prefix } = this.config;
+        const fullKey = `${prefix}:${key}`;
+
+        const count = await redis.incr(fullKey);
+
+        if (count === 1) {
+            await redis.expire(fullKey, time);
+        }
+
+        if (count > maxRequests) {
+            throw new Error("Too many requests");
+        }
+    }
+}
+
 export const globalRatelimit = new Ratelimit({
-    redis: kv,
-    limiter: Ratelimit.slidingWindow(120, "2m"),
+    time: 120,
+    maxRequests: 120,
     prefix: "global-ratelimit",
 });
 
 export const messageRatelimit = new Ratelimit({
-    redis: kv,
-    limiter: Ratelimit.slidingWindow(10, "10s"),
+    time: 10,
+    maxRequests: 10,
     prefix: "message-ratelimit",
 });
 
 export const roomRatelimit = new Ratelimit({
-    redis: kv,
-    limiter: Ratelimit.slidingWindow(3, "10m"),
+    time: 600,
+    maxRequests: 3,
     prefix: "room-ratelimit",
 });
 
@@ -36,6 +60,5 @@ export async function ratelimit(
     const ip = getClientIp(request);
     if (!ip) throw new ParseError(Error("Failed to get client IP"));
 
-    const { success } = await ratelimit.limit(key ? `${ip}:${key}` : ip);
-    if (!success) throw new RatelimitError("Too many requests");
+    await ratelimit.limit(key ? `${ip}:${key}` : ip);
 }

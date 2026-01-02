@@ -56,4 +56,4 @@ jobs:
                   password: ${{ secrets.SSH_PASSWORD }}
                   script: |
                       cd /opt/whispr
-                      docker compose up -d --force-recreate --pull always server
+                      docker compose up -d --force-recreate --pull always website

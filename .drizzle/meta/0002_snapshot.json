@@ -1,0 +1,133 @@
+{
+    "id": "c9222002-68f6-410f-9f1c-c26a06562eb2",
+    "prevId": "97930b12-e624-44b1-bba4-82da612a583e",
+    "version": "7",
+    "dialect": "postgresql",
+    "tables": {
+        "public.messages": {
+            "name": "messages",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "integer",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "identity": {
+                        "name": "messages_id_seq",
+                        "increment": "1",
+                        "minValue": "1",
+                        "maxValue": "2147483647",
+                        "startWith": "1",
+                        "cache": "1",
+                        "cycle": false,
+                        "schema": "public",
+                        "type": "byDefault"
+                    }
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "room_id": {
+                    "name": "room_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "cipher_text": {
+                    "name": "cipher_text",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "iv": {
+                    "name": "iv",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "messages_room_id_rooms_id_fk": {
+                    "name": "messages_room_id_rooms_id_fk",
+                    "tableFrom": "messages",
+                    "columnsFrom": ["room_id"],
+                    "tableTo": "rooms",
+                    "columnsTo": ["id"],
+                    "onUpdate": "no action",
+                    "onDelete": "cascade"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.rooms": {
+            "name": "rooms",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "expired_at": {
+                    "name": "expired_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "NOW() + INTERVAL '10 minutes'"
+                },
+                "users": {
+                    "name": "users",
+                    "type": "jsonb",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "public_keys": {
+                    "name": "public_keys",
+                    "type": "json",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {
+                "rooms_max_users": {
+                    "name": "rooms_max_users",
+                    "value": "jsonb_array_length(\"rooms\".\"users\") <= 2"
+                }
+            },
+            "isRLSEnabled": false
+        }
+    },
+    "enums": {},
+    "schemas": {},
+    "views": {},
+    "sequences": {},
+    "roles": {},
+    "policies": {},
+    "_meta": {
+        "columns": {},
+        "schemas": {},
+        "tables": {}
+    }
+}

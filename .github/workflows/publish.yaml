@@ -1,0 +1,59 @@
+name: Build and deploy
+
+on:
+    push:
+        branches: ["main"]
+
+env:
+    IMAGE_NAME: ghcr.io/jesseogunlaja/whispr
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+
+        steps:
+            - uses: actions/checkout@v5
+
+            - name: Login to ghcr.io
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build and push image
+              uses: docker/build-push-action@v6
+              with:
+                  push: true
+                  tags: |
+                      ${{ env.IMAGE_NAME }}:latest
+                      ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+    deploy:
+        needs: build
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v5
+
+            - name: Copy docker-compose.yaml to server
+              uses: appleboy/scp-action@v1
+              with:
+                  host: ${{ vars.SERVER_HOST }}
+                  username: root
+                  password: ${{ secrets.SSH_PASSWORD }}
+                  source: "docker-compose.yaml,Dockerfile.postgres"
+                  target: "/opt/whispr"
+
+            - name: Deploy to server
+              uses: appleboy/ssh-action@v1
+              with:
+                  host: ${{ vars.SERVER_HOST }}
+                  username: root
+                  password: ${{ secrets.SSH_PASSWORD }}
+                  script: |
+                      cd /opt/whispr
+                      docker compose up -d --force-recreate --pull always server

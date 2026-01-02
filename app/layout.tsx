@@ -1,7 +1,6 @@
 import PublicKeysProvider from "@/app/_components/PublicKeysProvider";
 import QueryProvider from "@/app/_components/QueryProvider";
 import { ChildrenProps } from "@/lib/types";
-import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import ToastProvider from "./_components/ToastProvider";
@@ -38,7 +37,6 @@ export default function RootLayout({ children }: ChildrenProps) {
             <body className={poppins.className}>
                 <link rel="icon" href="/favicon.ico" />
                 <ToastProvider />
-                <Analytics />
                 <QueryProvider>
                     <PublicKeysProvider>{children}</PublicKeysProvider>
                 </QueryProvider>

@@ -2,7 +2,7 @@
 
 import { useStrictContext } from "@/hooks/useStrictContext";
 import { Room } from "@/lib/db/schema";
-import { ChildrenProps, DecryptedMessage } from "@/lib/types";
+import { ChildrenProps, DecryptedMessage, Signature } from "@/lib/types";
 import { createContext } from "react";
 import { useOptimisticMessages } from "../_hooks/useOptimisticMessages";
 import { useRealtime } from "../_hooks/useRealtime";
@@ -14,12 +14,7 @@ interface RoomSession {
     userId: string | undefined;
     room: Room | undefined;
     sharedKey: CryptoKey | undefined;
-    signature:
-        | {
-              signature: string;
-              window: string;
-          }
-        | undefined;
+    signature: Signature | undefined;
     optimisticMessages: DecryptedMessage[];
     addOptimisticMessage: (
         _message: Pick<DecryptedMessage, "ciphertext" | "iv" | "content">

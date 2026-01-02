@@ -1,0 +1,35 @@
+services:
+    website:
+        image: ghcr.io/jesseogunlaja/whispr:latest
+        environment:
+            - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
+            - NEXT_PUBLIC_STREAMTHING_SERVER_REGION=${NEXT_PUBLIC_STREAMTHING_SERVER_REGION}
+            - NEXT_PUBLIC_STREAMTHING_SERVER_ID=${NEXT_PUBLIC_STREAMTHING_SERVER_ID}
+            - JWT_SIGNING_KEY=${JWT_SIGNING_KEY}
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
+            - STREAMTHING_SERVER_PASSWORD=${STREAMTHING_SERVER_PASSWORD}
+        ports:
+            - "80:3000"
+        depends_on:
+            - postgres
+            - redis
+
+    redis:
+        image: redis:8.2-alpine
+        command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+        volumes:
+            - redis-db:/data
+
+    postgres:
+        build:
+            context: .
+            dockerfile: Dockerfile.postgres
+        container_name: postgres
+        environment:
+            POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+        volumes:
+            - postgres-data:/var/lib/postgresql/
+
+volumes:
+    postgres-data:
+    redis-db:

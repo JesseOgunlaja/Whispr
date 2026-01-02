@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
     cacheComponents: true,
     reactStrictMode: false,
     reactCompiler: true,
+    output: "standalone",
 };
 
 export default nextConfig;

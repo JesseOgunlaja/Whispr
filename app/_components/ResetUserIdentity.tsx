@@ -36,10 +36,10 @@ export default function ResetUserIdentity() {
     return (
         <button
             onClick={() => resetIdentity()}
+            aria-label="Reset identity"
             {...(isRefreshing ? { className: styles.refreshing } : {})}
         >
             <RefreshCw />
-            <span id="sr-only">Reset identity</span>
         </button>
     );
 }

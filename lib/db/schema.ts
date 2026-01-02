@@ -1,7 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import {
     check,
-    index,
     integer,
     json,
     jsonb,
@@ -26,11 +25,7 @@ export const rooms = pgTable(
             >()
             .notNull(),
     },
-    (t) => [
-        check("rooms_max_users", sql`jsonb_array_length(${t.users}) <= 2`),
-        index("idx_rooms_expired").on(t.expiredAt),
-        sql`CREATE INDEX idx_rooms_users ON rooms USING GIN (${t.users});`,
-    ]
+    (t) => [check("rooms_max_users", sql`jsonb_array_length(${t.users}) <= 2`)]
 );
 
 const _roomSchema = createSelectSchema(rooms);
@@ -42,20 +37,16 @@ export const roomRelations = relations(rooms, ({ many }) => ({
     messages: many(messages),
 }));
 
-export const messages = pgTable(
-    "messages",
-    {
-        id: integer().generatedByDefaultAsIdentity().primaryKey(),
-        createdAt: timestamp("created_at").defaultNow().notNull(),
-        roomId: text()
-            .notNull()
-            .references(() => rooms.id, { onDelete: "cascade" }),
-        ciphertext: text("cipher_text").notNull(),
-        userId: text("user_id").notNull(),
-        iv: text().notNull(),
-    },
-    (t) => [index("idx_messages_room").on(t.roomId)]
-);
+export const messages = pgTable("messages", {
+    id: integer().generatedByDefaultAsIdentity().primaryKey(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    roomId: text("room_id")
+        .notNull()
+        .references(() => rooms.id, { onDelete: "cascade" }),
+    ciphertext: text("cipher_text").notNull(),
+    userId: text("user_id").notNull(),
+    iv: text().notNull(),
+});
 
 const _messageSchema = createSelectSchema(messages);
 export type Message = z.infer<typeof _messageSchema>;

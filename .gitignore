@@ -44,4 +44,4 @@ next-env.d.ts
 .vscode
 
 # docker
-docker-compose.yaml
+docker-compose.dev.yaml

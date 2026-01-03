@@ -1,13 +1,26 @@
 import { ParseError } from "elysia";
-import { redis } from "./db/db";
 import { getClientIp } from "./server-lib";
 
 export class RatelimitError extends Error {
-    constructor(public message: string) {
-        super(message);
+    constructor() {
+        super("Too many requests");
         this.name = "Ratelimit error";
     }
 }
+
+const ratelimitMap = new Map<string, number[]>();
+
+setInterval(() => {
+    const now = Date.now();
+    for (const [key, timestamps] of ratelimitMap) {
+        if (
+            !timestamps.length ||
+            timestamps[timestamps.length - 1] < now - 600_000
+        ) {
+            ratelimitMap.delete(key);
+        }
+    }
+}, 60000).unref();
 
 class Ratelimit {
     constructor(
@@ -18,19 +31,22 @@ class Ratelimit {
         }
     ) {}
 
-    async limit(key: string) {
+    limit(suffix: string) {
         const { time, maxRequests, prefix } = this.config;
-        const fullKey = `${prefix}:${key}`;
+        const key = `${prefix}:${suffix}`;
+        const now = Date.now();
 
-        const count = await redis.incr(fullKey);
+        const windowStart = now - time * 1000;
+        const timestamps = ratelimitMap.get(key) ?? [];
 
-        if (count === 1) {
-            await redis.expire(fullKey, time);
+        while (timestamps.length && timestamps[0] <= windowStart) {
+            timestamps.shift();
         }
 
-        if (count > maxRequests) {
-            throw new RatelimitError("Too many requests");
-        }
+        if (timestamps.length >= maxRequests) throw new RatelimitError();
+
+        timestamps.push(now);
+        ratelimitMap.set(key, timestamps);
     }
 }
 
@@ -52,7 +68,7 @@ export const roomRatelimit = new Ratelimit({
     prefix: "room-ratelimit",
 });
 
-export async function ratelimit(
+export function ratelimit(
     ratelimit: Ratelimit,
     request: Request,
     key?: string
@@ -60,5 +76,5 @@ export async function ratelimit(
     const ip = getClientIp(request);
     if (!ip) throw new ParseError(Error("Failed to get client IP"));
 
-    await ratelimit.limit(key ? `${ip}:${key}` : ip);
+    ratelimit.limit(key ? `${ip}:${key}` : ip);
 }

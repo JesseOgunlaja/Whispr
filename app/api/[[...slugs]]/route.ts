@@ -31,8 +31,8 @@ export const app = new Elysia({ prefix: "/api" })
                 } else return { type: "unknown", message: error };
         }
     })
-    .derive({ as: "global" }, async ({ request }) => {
-        await ratelimit(globalRatelimit, request);
+    .derive({ as: "global" }, ({ request }) => {
+        ratelimit(globalRatelimit, request);
     })
     .use(users)
     .use(rooms)

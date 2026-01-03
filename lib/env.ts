@@ -10,7 +10,6 @@ export const env = createEnv({
         JWT_SIGNING_KEY: z.string(),
         DATABASE_URL: z.string(),
         STREAMTHING_SERVER_PASSWORD: z.string(),
-        REDIS_PASSWORD: z.string(),
     },
     runtimeEnv: {
         NEXT_PUBLIC_STREAMTHING_SERVER_REGION:
@@ -20,6 +19,5 @@ export const env = createEnv({
         JWT_SIGNING_KEY: process.env.JWT_SIGNING_KEY,
         DATABASE_URL: process.env.DATABASE_URL,
         STREAMTHING_SERVER_PASSWORD: process.env.STREAMTHING_SERVER_PASSWORD,
-        REDIS_PASSWORD: process.env.REDIS_PASSWORD,
     },
 });

@@ -1,4 +1,5 @@
 import { ParseError } from "elysia";
+import { redis } from "./db/db";
 import { getClientIp } from "./server-lib";
 
 export class RatelimitError extends Error {
@@ -7,20 +8,6 @@ export class RatelimitError extends Error {
         this.name = "Ratelimit error";
     }
 }
-
-const ratelimitMap = new Map<string, number[]>();
-
-setInterval(() => {
-    const now = Date.now();
-    for (const [key, timestamps] of ratelimitMap) {
-        if (
-            !timestamps.length ||
-            timestamps[timestamps.length - 1] < now - 600_000
-        ) {
-            ratelimitMap.delete(key);
-        }
-    }
-}, 60000).unref();
 
 class Ratelimit {
     constructor(
@@ -31,22 +18,21 @@ class Ratelimit {
         }
     ) {}
 
-    limit(suffix: string) {
-        const { time, maxRequests, prefix } = this.config;
-        const key = `${prefix}:${suffix}`;
-        const now = Date.now();
+    async limit(suffix: string) {
+        try {
+            console.time("ratelimit");
+            const { time, maxRequests, prefix } = this.config;
 
-        const windowStart = now - time * 1000;
-        const timestamps = ratelimitMap.get(key) ?? [];
+            const key = `${prefix}:${suffix}`;
+            const count = await redis.incr(key);
 
-        while (timestamps.length && timestamps[0] <= windowStart) {
-            timestamps.shift();
+            if (count === 1) await redis.expire(key, time);
+            else if (count > maxRequests) throw new RatelimitError();
+        } catch {
+            throw new RatelimitError();
+        } finally {
+            console.timeEnd("ratelimit");
         }
-
-        if (timestamps.length >= maxRequests) throw new RatelimitError();
-
-        timestamps.push(now);
-        ratelimitMap.set(key, timestamps);
     }
 }
 
@@ -68,7 +54,7 @@ export const roomRatelimit = new Ratelimit({
     prefix: "room-ratelimit",
 });
 
-export function ratelimit(
+export async function ratelimit(
     ratelimit: Ratelimit,
     request: Request,
     key?: string
@@ -76,5 +62,5 @@ export function ratelimit(
     const ip = getClientIp(request);
     if (!ip) throw new ParseError(Error("Failed to get client IP"));
 
-    ratelimit.limit(key ? `${ip}:${key}` : ip);
+    await ratelimit.limit(key ? `${ip}:${key}` : ip);
 }

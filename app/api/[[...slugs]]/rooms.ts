@@ -10,7 +10,7 @@ export const rooms = new Elysia({ prefix: "/room" })
     .post(
         "/create",
         async ({ body, userId, request }) => {
-            ratelimit(roomRatelimit, request);
+            await ratelimit(roomRatelimit, request);
 
             const roomId = nanoid();
             const { encryptionKey, signingKey } = body;
@@ -41,7 +41,7 @@ export const rooms = new Elysia({ prefix: "/room" })
         async ({ room, userId, query, request }) => {
             if (room.users.includes(userId)) return { success: true };
             if (room.users.length > 1) throw new AuthError("Room full");
-            ratelimit(roomRatelimit, request, room.id);
+            await ratelimit(roomRatelimit, request, room.id);
 
             const { encryptionKey, signingKey } = query;
 

@@ -12,7 +12,7 @@ export const messages = new Elysia({ prefix: "/messages" })
         async ({ body, room, userId, request }) => {
             const { ciphertext, iv } = body;
 
-            ratelimit(messageRatelimit, request, room.id);
+            await ratelimit(messageRatelimit, request, room.id);
 
             const message = {
                 ciphertext,

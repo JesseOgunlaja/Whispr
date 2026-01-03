@@ -14,10 +14,11 @@ export const loadUser = new Elysia({ name: "load-user" })
     .guard({
         cookie: t.Cookie({ token: t.String() }),
     })
-    .derive(async ({ cookie }) => {
-        const token = cookie.token.value;
+    .derive(async ({ cookie, request }) => {
+        const userId =
+            request.headers.get("user-id") ??
+            (await decodeJWT(cookie.token.value)).userId;
 
-        const { userId } = await decodeJWT(token);
         if (!userId) throw new AuthError("Invalid auth token");
 
         return { userId };
@@ -30,8 +31,8 @@ export const loadRoom = new Elysia({ name: "load-room" })
     })
     .derive(async ({ params: { roomId } }) => {
         const room = await getRoomById(roomId);
-
         if (!room) throw new AuthError("Room not found");
+
         return { room };
     })
     .as("scoped");

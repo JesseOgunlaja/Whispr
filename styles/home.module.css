@@ -49,6 +49,7 @@
 
     & div {
         padding: 6px 10px;
+        padding-right: 6.5px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -63,7 +64,6 @@
             background: none;
             color: #dadada;
             padding: 7.5px;
-            padding-right: 5px;
             border-radius: 5px;
             border: #333 1px solid;
             display: flex;

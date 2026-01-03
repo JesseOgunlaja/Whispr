@@ -1,4 +1,4 @@
-import { and, arrayContains, eq, gt, lt, sql } from "drizzle-orm";
+import { and, arrayContains, eq, lt, sql } from "drizzle-orm";
 import { db } from "./db";
 import { Message, messages, Room, rooms } from "./schema";
 
@@ -28,10 +28,6 @@ export async function createMessage(
 
 export async function updateRoom(room: Partial<Room>, roomId: string) {
     return await db.update(rooms).set(room).where(eq(rooms.id, roomId));
-}
-
-export async function deleteExpiredRooms() {
-    return await db.delete(rooms).where(gt(sql`NOW()`, rooms.expiredAt));
 }
 
 export async function deleteRoom(roomId: string) {

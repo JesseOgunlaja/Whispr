@@ -19,20 +19,13 @@ class Ratelimit {
     ) {}
 
     async limit(suffix: string) {
-        try {
-            console.time("ratelimit");
-            const { time, maxRequests, prefix } = this.config;
+        const { time, maxRequests, prefix } = this.config;
 
-            const key = `${prefix}:${suffix}`;
-            const count = await redis.incr(key);
+        const key = `${prefix}:${suffix}`;
+        const count = await redis.incr(key);
 
-            if (count === 1) await redis.expire(key, time);
-            else if (count > maxRequests) throw new RatelimitError();
-        } catch {
-            throw new RatelimitError();
-        } finally {
-            console.timeEnd("ratelimit");
-        }
+        if (count === 1) await redis.expire(key, time);
+        else if (count > maxRequests) throw new RatelimitError();
     }
 }
 

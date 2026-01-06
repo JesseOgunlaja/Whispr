@@ -19,12 +19,14 @@ export function useRealtime(
     useEffect(() => {
         if (!userId || !signature || !roomId) return;
 
+        let canceled = false;
         let stream: ClientStream | null = null;
+
         api.realtime
             .token({ roomId })
             .get({ query: signature })
             .then(({ data }) => {
-                if (!data?.success) return;
+                if (!data?.success || canceled) return;
 
                 stream = createClientStream({
                     region: env.NEXT_PUBLIC_STREAMTHING_SERVER_REGION,
@@ -44,6 +46,10 @@ export function useRealtime(
                 });
             });
 
-        return () => stream?.disconnect();
-    }, [userId, roomId, signature, queryClient, router]);
+        return () => {
+            canceled = true;
+            stream?.disconnect();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userId, roomId, signature]);
 }

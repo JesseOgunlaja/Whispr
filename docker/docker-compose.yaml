@@ -1,11 +1,8 @@
 services:
     website:
         image: ghcr.io/jesseogunlaja/whispr:latest
-        environment:
-            - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
-            - JWT_SIGNING_KEY=${JWT_SIGNING_KEY}
-            - REDIS_PASSWORD=${REDIS_PASSWORD}
-            - STREAMTHING_SERVER_PASSWORD=${STREAMTHING_SERVER_PASSWORD}
+        env_file:
+            - .env
         ports:
             - "80:3000"
         depends_on:

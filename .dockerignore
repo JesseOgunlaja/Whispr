@@ -6,7 +6,6 @@ README.md
 .gitignore
 Dockerfile
 .dockerignore
+docker
 .env
-docker-compose.yaml
-docker-compose.dev.yaml
 .github

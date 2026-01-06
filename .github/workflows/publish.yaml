@@ -5,7 +5,8 @@ on:
         branches: ["main"]
 
 env:
-    IMAGE_NAME: ghcr.io/jesseogunlaja/whispr
+    WEBSITE_IMAGE_NAME: ghcr.io/jesseogunlaja/whispr
+    POSTGRES_IMAGE_NAME: ghcr.io/jesseogunlaja/whispr-postgres
 
 jobs:
     build:
@@ -27,10 +28,20 @@ jobs:
             - name: Build and push image
               uses: docker/build-push-action@v6
               with:
+                  file: docker/Dockerfile
                   push: true
                   tags: |
-                      ${{ env.IMAGE_NAME }}:latest
-                      ${{ env.IMAGE_NAME }}:${{ github.sha }}
+                      ${{ env.WEBSITE_IMAGE_NAME }}:latest
+                      ${{ env.WEBSITE_IMAGE_NAME }}:${{ github.sha }}
+
+            - name: Build and push postgres image
+              uses: docker/build-push-action@v6
+              with:
+                  file: docker/Dockerfile.postgres
+                  push: true
+                  tags: |
+                      ${{ env.POSTGRES_IMAGE_NAME }}:latest
+                      ${{ env.POSTGRES_IMAGE_NAME }}:${{ github.sha }}
 
     deploy:
         needs: build
@@ -45,7 +56,7 @@ jobs:
                   host: ${{ vars.SERVER_HOST }}
                   username: root
                   password: ${{ secrets.SSH_PASSWORD }}
-                  source: "docker-compose.yaml,Dockerfile.postgres"
+                  source: "docker/docker-compose.yaml"
                   target: "/opt/whispr"
 
             - name: Deploy to server
@@ -56,4 +67,4 @@ jobs:
                   password: ${{ secrets.SSH_PASSWORD }}
                   script: |
                       cd /opt/whispr
-                      docker compose up -d --force-recreate --pull always website
+                      docker compose up -d --force-recreate --pull always website postgres

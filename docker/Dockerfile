@@ -24,11 +24,6 @@ WORKDIR /app
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/index.js /app/drizzle.config.ts ./
-COPY --from=builder /app/.drizzle ./.drizzle
-
-RUN rm package.json
-RUN bun add drizzle-kit drizzle-orm drizzle-zod
 
 EXPOSE 3000
-CMD ["bun", "run", "index.js"]
+CMD ["bun", "run", "server.js"]

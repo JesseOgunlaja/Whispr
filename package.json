@@ -5,9 +5,8 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
-        "start": "next start",
-        "lint": "eslint .",
-        "upgrade": "bun add next@latest react@latest react-dom@latest eslint-config-next@latest @types/react@latest @types/react-dom@latest"
+        "start": "docker-compose -f docker/docker-compose.dev.yaml up --build",
+        "lint": "eslint ."
     },
     "dependencies": {
         "@elysiajs/eden": "^1.4.6",
@@ -37,7 +36,6 @@
         "@types/react": "^19.2.7",
         "@types/react-dom": "^19.2.3",
         "babel-plugin-react-compiler": "1.0.0",
-        "drizzle-kit": "^0.31.8",
         "eslint": "^9.39.2",
         "eslint-config-next": "^16.1.1",
         "typescript": "^5.9.3"

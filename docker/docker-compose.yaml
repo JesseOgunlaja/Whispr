@@ -19,9 +19,7 @@ services:
             - redis-db:/data
 
     postgres:
-        build:
-            context: .
-            dockerfile: Dockerfile.postgres
+        image: ghcr.io/jesseogunlaja/whispr-postgres:latest
         container_name: postgres
         environment:
             POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"

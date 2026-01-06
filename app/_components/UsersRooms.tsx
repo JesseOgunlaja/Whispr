@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@/lib/lib";
+import { api, formatMessageDate } from "@/lib/lib";
 import styles from "@/styles/home.module.css";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
@@ -25,7 +25,15 @@ export default function UsersRooms() {
                 {res?.data?.rooms.map((room) => (
                     <li key={room.id}>
                         <Link href={`/room/${room.id}`}>
-                            {room.id}
+                            <div>
+                                <span>{room.id}</span>
+                                <span>
+                                    Last used:{" "}
+                                    {room.lastUsed
+                                        ? formatMessageDate(room.lastUsed)
+                                        : "Never"}
+                                </span>
+                            </div>
                             <ArrowRight />
                         </Link>
                     </li>

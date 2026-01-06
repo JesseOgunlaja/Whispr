@@ -26,5 +26,13 @@ export const users = new Elysia({ prefix: "/user" })
     )
     .use(loadUser)
     .get("/rooms", async ({ userId }) => {
-        return { rooms: await getUsersRooms(userId) };
+        const usersRooms = await getUsersRooms(userId);
+        return {
+            rooms: usersRooms.map(({ id, messages }) => ({
+                id,
+                lastUsed: messages.sort(
+                    (a, b) => +b.createdAt - +a.createdAt
+                )[0]?.createdAt,
+            })),
+        };
     });

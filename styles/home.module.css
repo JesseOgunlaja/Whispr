@@ -112,7 +112,7 @@
             margin-bottom: 10px;
         }
         ul {
-            max-height: 150px;
+            max-height: 170px;
             &:has(li:nth-child(3)) {
                 overflow: auto;
                 padding-right: 10px;
@@ -140,6 +140,16 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+
+            div {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                & span:last-of-type {
+                    color: #666;
+                    font-size: 14px;
+                }
+            }
         }
     }
 }

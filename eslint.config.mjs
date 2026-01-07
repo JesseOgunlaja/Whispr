@@ -14,10 +14,10 @@ export default defineConfig([
             "react-hooks/set-state-in-effect": "off",
             "no-unused-vars": "off",
             "@typescript-eslint/no-unused-expressions": "off",
-            "no-empty": "off",
 
             "react-hooks/exhaustive-deps": "warn",
             "react-hooks/rules-of-hooks": "warn",
+            "no-empty": "warn",
             "no-console": "warn",
             "prefer-const": "warn",
             "@typescript-eslint/no-explicit-any": "warn",

@@ -18,30 +18,37 @@ export default function MessagesList() {
     }, [messages.length]);
 
     return (
-        <ul ref={chatRef}>
-            {messages
-                .concat(optimisticMessages)
-                .sort((a, b) => +new Date(a.createdAt) - +new Date(b.createdAt))
-                .map((message) => (
-                    <li key={message.id}>
-                        <p
-                            className={
-                                message.userId === userId
-                                    ? styles.self
-                                    : styles.other
-                            }
-                        >
-                            {message.userId === userId
-                                ? "Me"
-                                : `anonymous-${message.userId.slice(
-                                      0,
-                                      5
-                                  )}`}{" "}
-                            <span>{formatMessageDate(message.createdAt)}</span>
-                        </p>
-                        <p>{message.content}</p>
-                    </li>
-                ))}
-        </ul>
+        <main>
+            <ul ref={chatRef}>
+                {messages
+                    .concat(optimisticMessages)
+                    .sort(
+                        (a, b) =>
+                            +new Date(a.createdAt) - +new Date(b.createdAt)
+                    )
+                    .map((message) => (
+                        <li key={message.id}>
+                            <p
+                                className={
+                                    message.userId === userId
+                                        ? styles.self
+                                        : styles.other
+                                }
+                            >
+                                {message.userId === userId
+                                    ? "Me"
+                                    : `anonymous-${message.userId.slice(
+                                          0,
+                                          5
+                                      )}`}{" "}
+                                <span>
+                                    {formatMessageDate(message.createdAt)}
+                                </span>
+                            </p>
+                            <p>{message.content}</p>
+                        </li>
+                    ))}
+            </ul>
+        </main>
     );
 }

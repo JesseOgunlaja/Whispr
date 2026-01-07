@@ -1,0 +1,35 @@
+services:
+    website:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile
+        environment:
+            - DATABASE_URL=postgres://postgres:dummy@postgres:5432/postgres
+            - JWT_SIGNING_KEY=dummy
+            - REDIS_PASSWORD=dummy
+            - STREAMTHING_SERVER_PASSWORD=${STREAMTHING_SERVER_PASSWORD}
+        ports:
+            - "3000:3000"
+        depends_on:
+            - postgres
+            - redis
+
+    redis:
+        image: redis:8.2-alpine
+        command: ["redis-server", "--requirepass", "dummy"]
+        volumes:
+            - redis-db:/data
+
+    postgres:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.postgres
+        environment:
+            POSTGRES_PASSWORD: "dummy"
+        container_name: postgres
+        volumes:
+            - postgres-data:/var/lib/postgresql/
+
+volumes:
+    postgres-data:
+    redis-db:

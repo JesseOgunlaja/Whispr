@@ -1,1 +1,16 @@
-[Whispr](https://whispr.jesseogu.dev) is an end-to-end encrypted anonymous chat app with self-destructing chats.
+# Whispr
+
+Whispr is an anonymous, self-destructing chat application built with **Next.js**. It prioritizes privacy, real-time communication, and secure user isolation. Conversations self-destruct after use, and user sessions cannot be reused in different browsers — even if tokens are stolen.
+
+## Features
+
+-   🛡️ **Anonymous chat** (no persistent identities)
+-   ⏳ **Self-destructing messages**
+-   🚀 **Real-time messaging** using **[Streamthing](https://streamthing.dev)**
+-   🔐 **End-to-end encryption (E2EE)** powered by **WebCrypto**
+-   🔑 **ECDSA key pairs** for session-bound authentication
+-   🧪 **Automated testing**
+-   📦 **CI/CD builds Docker images**
+-   ⚙️ **Rate limiting** via Redis
+-   🗄️ **PostgreSQL** for persistent storage
+-   🐳 **Docker Compose** orchestrates Redis, Postgres, and the app

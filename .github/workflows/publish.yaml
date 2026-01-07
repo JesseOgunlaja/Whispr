@@ -31,7 +31,7 @@ jobs:
 
             - name: Stop dev server
               if: always()
-              run: docker compose down
+              run: docker compose -f docker/docker-compose.staging.yaml down
 
     build:
         needs: test

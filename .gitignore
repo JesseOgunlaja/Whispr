@@ -45,3 +45,7 @@ next-env.d.ts
 
 # docker
 docker/docker-compose.dev.yaml
+
+# testing
+test-results
+

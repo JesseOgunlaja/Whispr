@@ -29,7 +29,7 @@ export default function ResetUserIdentity() {
         },
         onSuccess: () => {
             router.refresh();
-            queryClient.setQueryData(["user"], []);
+            queryClient.setQueryData(["rooms"], []);
         },
     });
 

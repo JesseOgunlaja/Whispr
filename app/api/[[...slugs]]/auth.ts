@@ -17,7 +17,7 @@ export const loadUser = new Elysia({ name: "load-user" })
     .derive(async ({ cookie, request }) => {
         const userId =
             request.headers.get("user-id") ??
-            (await decodeJWT(cookie.token.value)).userId;
+            (await decodeJWT(cookie.token.value))?.userId;
 
         if (!userId) throw new AuthError("Invalid auth token");
 

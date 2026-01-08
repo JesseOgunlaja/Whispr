@@ -21,10 +21,9 @@ export const messages = new Elysia({ prefix: "/messages" })
                 userId,
             };
 
+            const { createdAt, id } = await createMessage(message);
             after(async () => {
                 const stream = await createWebsocketStream();
-
-                const { createdAt, id } = await createMessage(message);
 
                 stream.send(
                     room.id,

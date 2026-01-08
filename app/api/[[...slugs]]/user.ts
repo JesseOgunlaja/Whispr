@@ -1,4 +1,4 @@
-import { signJWT } from "@/lib/auth";
+import { getTokenCookieConfig, signJWT } from "@/lib/auth";
 import { getUsersRooms } from "@/lib/db/dal";
 import { nanoid } from "@/lib/lib";
 import { Elysia, t } from "elysia";
@@ -10,13 +10,7 @@ export const users = new Elysia({ prefix: "/user" })
         async ({ cookie }) => {
             const userId = nanoid();
             const token = await signJWT({ userId });
-            cookie.token.set({
-                value: token,
-                httpOnly: true,
-                sameSite: "lax",
-                secure: true,
-                maxAge: 60 * 60,
-            });
+            cookie.token.set(getTokenCookieConfig(token));
         },
         {
             cookie: t.Object({

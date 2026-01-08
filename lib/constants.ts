@@ -1,1 +1,1 @@
-export const ROOM_TTL_MINUTES = 10;
+export const USER_IDENTITY_TTL_SECONDS = 60 * 60 * 24 * 30;

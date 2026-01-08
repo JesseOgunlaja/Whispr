@@ -13,12 +13,15 @@
     align-items: center;
 }
 
+.room main {
+    overflow-y: auto;
+}
+
 .room main ul {
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    overflow-y: auto;
 
     p:first-of-type {
         display: flex;

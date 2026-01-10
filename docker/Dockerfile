@@ -1,10 +1,10 @@
-FROM oven/bun:latest AS bun
+FROM oven/bun:alpine AS bun
 
 FROM bun AS builder
 WORKDIR /app
 
 COPY package.json bun.lock ./
-RUN bun ci
+RUN BUN_INSTALL_CACHE=/tmp/bun_cache bun ci && rm -rf /tmp/bun_cache
 
 COPY . .
 

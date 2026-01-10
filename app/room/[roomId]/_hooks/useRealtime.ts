@@ -35,14 +35,18 @@ export function useRealtime(
                 });
 
                 Object.entries(handlers).forEach(([event, handler]) => {
-                    stream?.receive(event, (payload) =>
-                        handler(payload, {
-                            userId,
-                            roomId,
-                            queryClient,
-                            router,
-                        })
-                    );
+                    stream?.receive(event, (payload) => {
+                        try {
+                            handler(payload, {
+                                userId,
+                                roomId,
+                                queryClient,
+                                router,
+                            });
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    });
                 });
             });
 
@@ -50,6 +54,5 @@ export function useRealtime(
             canceled = true;
             stream?.disconnect();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userId, roomId, signature]);
+    }, [userId, roomId, signature, queryClient, router]);
 }

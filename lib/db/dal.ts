@@ -41,3 +41,7 @@ export async function getUsersRooms(userId: string) {
         with: { messages: true },
     });
 }
+
+export async function deleteExpiredRooms() {
+    return await db.delete(rooms).where(lt(sql`NOW()`, rooms.expiredAt));
+}

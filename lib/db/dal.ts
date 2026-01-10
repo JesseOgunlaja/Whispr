@@ -43,5 +43,5 @@ export async function getUsersRooms(userId: string) {
 }
 
 export async function deleteExpiredRooms() {
-    return await db.delete(rooms).where(lt(sql`NOW()`, rooms.expiredAt));
+    return await db.delete(rooms).where(lt(rooms.expiredAt, sql`NOW()`));
 }

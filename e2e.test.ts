@@ -4,9 +4,10 @@ const CREATE_ROOM_PATH = "main > div > button:last-child";
 const MESSAGE_INPUT_PATH = 'footer > form > input[type="text"]';
 const SEND_BUTTON_PATH = 'footer > form > button[type="submit"]';
 const CHAT_PATH = "main > ul:has(li > p > span)";
+const DESTROY_ROOM_PATH = "header > div:last-child > button";
 
-test.setTimeout(5000);
-test("two users send messages", async () => {
+test.setTimeout(10000);
+test("two users send messages and destroy room", async () => {
     const browser = await chromium.launch();
 
     const browser1 = await browser.newContext();
@@ -32,6 +33,15 @@ test("two users send messages", async () => {
 
     await expect(user1.locator(CHAT_PATH)).toContainText("user2");
     await expect(user2.locator(CHAT_PATH)).toContainText("user1");
+
+    await user2.click(DESTROY_ROOM_PATH);
+    await sleep(250);
+
+    await expect(
+        "http://localhost:3000/",
+        "http://localhost:3000/?info=Room%20Destroyed"
+    ).toContain(user1.url());
+    await expect(user2.url()).toBe("http://localhost:3000/");
 
     await browser.close();
 });

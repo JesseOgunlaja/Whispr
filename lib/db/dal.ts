@@ -2,8 +2,6 @@ import { and, arrayContains, eq, lt, sql } from "drizzle-orm";
 import { db } from "./db";
 import { Message, messages, Room, rooms } from "./schema";
 
-export const EXPIRY_LIST_KEY = "room-expiry-list";
-
 export async function getRoomById(roomId: string) {
     return await db.query.rooms.findFirst({
         where: and(eq(rooms.id, roomId), lt(sql`NOW()`, rooms.expiredAt)),

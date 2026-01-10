@@ -47,7 +47,7 @@ const userJoinedSchema = z.object({
 
 const newMessageSchema = z.object({
     id: z.number(),
-    createdAt: z.date(),
+    createdAt: z.string().transform((str) => new Date(str)),
     roomId: z.string(),
     ciphertext: z.string(),
     userId: z.string(),

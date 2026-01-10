@@ -25,12 +25,14 @@ export type Signature = {
     window: string;
 };
 
-export type RealtimeHandler = (
-    payload: string,
-    ctx: {
-        userId: string;
-        roomId: string;
-        queryClient: QueryClient;
-        router: AppRouterInstance;
-    }
-) => void;
+export type RealtimeHandlers = {
+    [K in "user-joined" | "new-message" | "room-destroyed"]: (
+        payload: string,
+        ctx: {
+            userId: string;
+            roomId: string;
+            queryClient: QueryClient;
+            router: AppRouterInstance;
+        }
+    ) => void;
+};

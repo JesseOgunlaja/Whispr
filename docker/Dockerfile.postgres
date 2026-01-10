@@ -1,11 +1,5 @@
-FROM postgres:18
-
-USER root
-RUN apt-get update && \
-    apt-get install -y postgresql-18-cron && \
-    rm -rf /var/lib/apt/lists/*
+FROM postgres:18-alpine
 
 COPY lib/db/schema/*.sql /docker-entrypoint-initdb.d/
 
-USER postgres
-CMD ["postgres", "-c", "shared_preload_libraries=pg_cron", "-c", "cron.database_name=postgres"]
+CMD ["postgres"]

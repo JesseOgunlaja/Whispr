@@ -1,6 +1,7 @@
 import { globalRatelimit, ratelimit, RatelimitError } from "@/lib/ratelimit";
 import { Elysia } from "elysia";
 import { AuthError } from "./auth";
+import { startRoomCleanup } from "./cleanup";
 import { messages } from "./messages";
 import { realtime } from "./realtime";
 import { rooms } from "./rooms";
@@ -38,6 +39,8 @@ export const app = new Elysia({ prefix: "/api" })
     .use(rooms)
     .use(realtime)
     .use(messages);
+
+startRoomCleanup();
 
 export type App = typeof app;
 export const GET = app.fetch;

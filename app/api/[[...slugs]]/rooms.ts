@@ -3,7 +3,6 @@ import { isLikelyBase64Key, nanoid } from "@/lib/lib";
 import { ratelimit, roomRatelimit } from "@/lib/ratelimit";
 import { createWebsocketStream } from "@/lib/server-lib";
 import { Elysia, t } from "elysia";
-import { after } from "next/server";
 import { AuthError, isUserAuthorized, loadRoom, loadUser } from "./auth";
 
 export const rooms = new Elysia({ prefix: "/room" })
@@ -66,14 +65,14 @@ export const rooms = new Elysia({ prefix: "/room" })
                 room.id
             );
 
-            after(async () => {
+            setTimeout(async () => {
                 const stream = await createWebsocketStream();
                 stream.send(
                     room.id,
                     "user-joined",
                     JSON.stringify({ userId, encryptionKey, signingKey })
                 );
-            });
+            }, 0);
 
             return { success: true, room, userId };
         },
@@ -91,10 +90,10 @@ export const rooms = new Elysia({ prefix: "/room" })
     .post("/destroy/:roomId", async ({ room }) => {
         await deleteRoom(room.id);
 
-        after(async () => {
+        setTimeout(async () => {
             const stream = await createWebsocketStream();
             stream.send(room.id, "room-destroyed", "");
-        });
+        }, 0);
 
         return { success: true };
     });

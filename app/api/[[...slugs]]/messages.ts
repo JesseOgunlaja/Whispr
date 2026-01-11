@@ -2,7 +2,6 @@ import { createMessage } from "@/lib/db/dal";
 import { messageRatelimit, ratelimit } from "@/lib/ratelimit";
 import { createWebsocketStream } from "@/lib/server-lib";
 import { Elysia, t } from "elysia";
-import { after } from "next/server";
 import { isUserAuthorized } from "./auth";
 
 export const messages = new Elysia({ prefix: "/messages" })
@@ -22,7 +21,7 @@ export const messages = new Elysia({ prefix: "/messages" })
             };
 
             const { createdAt, id } = await createMessage(message);
-            after(async () => {
+            setTimeout(async () => {
                 const stream = await createWebsocketStream();
 
                 stream.send(
@@ -30,7 +29,7 @@ export const messages = new Elysia({ prefix: "/messages" })
                     "new-message",
                     JSON.stringify({ ...message, createdAt, id })
                 );
-            });
+            }, 0);
 
             return { success: true };
         },

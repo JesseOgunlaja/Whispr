@@ -1,3 +1,5 @@
+import { headers } from "next/headers";
+import React from "react";
 import { createServerStream } from "streamthing";
 import { env } from "./env";
 
@@ -23,3 +25,14 @@ export function getClientIp(request: Request) {
 
     return null;
 }
+
+export async function runInBackground(fn: () => Promise<void>) {
+    void fn();
+}
+
+export const getUserIdHeader = React.cache(async () => {
+    const userId = (await headers()).get("x-user-id");
+    if (!userId) throw new Error("No user id found");
+
+    return userId;
+});

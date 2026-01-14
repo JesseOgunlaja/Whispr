@@ -1,11 +1,10 @@
+import { useUserId } from "@/app/_components/UserIdProvider";
 import { Room } from "@/lib/db/schema";
 import { DecryptedMessage } from "@/lib/types";
 import { useState } from "react";
 
-export function useOptimisticMessages(roomSession: {
-    room: Room | undefined;
-    userId: string | undefined;
-}) {
+export function useOptimisticMessages(room?: Room) {
+    const { userId } = useUserId();
     const [optimisticMessages, setOptimisticMessages] = useState<
         DecryptedMessage[]
     >([]);
@@ -13,7 +12,7 @@ export function useOptimisticMessages(roomSession: {
     function addOptimisticMessage(
         message: Pick<DecryptedMessage, "ciphertext" | "iv" | "content">
     ) {
-        if (!roomSession.room || !roomSession.userId) return;
+        if (!room) return;
 
         setOptimisticMessages((current) => [
             ...current,
@@ -21,8 +20,8 @@ export function useOptimisticMessages(roomSession: {
                 ...message,
                 id: Math.random(),
                 createdAt: new Date(),
-                roomId: roomSession.room!.id,
-                userId: roomSession.userId!,
+                roomId: room!.id,
+                userId: userId,
             },
         ]);
     }
@@ -37,10 +36,10 @@ export function useOptimisticMessages(roomSession: {
     }
 
     function removeDuplicatedMessages() {
-        if (!roomSession.room || !roomSession.userId) return;
+        if (!room) return;
 
         const messageHashes = new Set(
-            roomSession.room.messages.map(
+            room.messages.map(
                 (message) => `${message.ciphertext}-${message.iv}`
             )
         );

@@ -16,7 +16,7 @@ export const loadUser = new Elysia({ name: "load-user" })
     })
     .derive(async ({ cookie, request }) => {
         const userId =
-            request.headers.get("user-id") ??
+            request.headers.get("x-user-id") ??
             (await decodeJWT(cookie.token.value))?.userId;
 
         if (!userId) throw new AuthError("Invalid auth token");
@@ -37,9 +37,20 @@ export const loadRoom = new Elysia({ name: "load-room" })
     })
     .as("scoped");
 
-export const isUserAuthorized = new Elysia({ name: "user-room-auth" })
+export const isUserInRoom = new Elysia({ name: "user-in-room" })
     .use(loadUser)
     .use(loadRoom)
+    .derive(async ({ room, userId }) => {
+        if (!room.users.includes(userId)) {
+            throw new AuthError("User not in room");
+        }
+    })
+    .as("scoped");
+
+export const isUserAuthorized = new Elysia({ name: "user-authorized" })
+    .use(loadUser)
+    .use(loadRoom)
+    .use(isUserInRoom)
     .guard({
         query: t.Object({
             signature: t.String(),
@@ -47,12 +58,6 @@ export const isUserAuthorized = new Elysia({ name: "user-room-auth" })
         }),
     })
     .derive(async ({ room, userId, query }) => {
-        if (!room.users.includes(userId)) {
-            throw new AuthError(
-                `User not in room ${room.users.length < 2 ? "SPACE" : ""}`
-            );
-        }
-
         const validSignature = await verifySignature(
             query.signature,
             room.publicKeys[userId].signingKey,
@@ -61,7 +66,5 @@ export const isUserAuthorized = new Elysia({ name: "user-room-auth" })
         );
 
         if (!validSignature) throw new AuthError("Invalid signature");
-
-        return { room, userId };
     })
     .as("scoped");

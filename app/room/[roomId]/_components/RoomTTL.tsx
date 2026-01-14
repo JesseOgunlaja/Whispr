@@ -4,25 +4,22 @@ import { formatTTL } from "@/lib/lib";
 import styles from "@/styles/room.module.css";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useRoomSession } from "./RoomSessionProvider";
+import { useRoom } from "../_components/RoomProvider";
 
 export default function RoomTTL() {
     const router = useRouter();
-    const [ttl, setTTL] = useState(Infinity);
-    const { room } = useRoomSession();
+    const { room } = useRoom();
+    const [ttl, setTTL] = useState(() =>
+        Math.floor((room.expiredAt.getTime() - Date.now()) / 1000)
+    );
 
     useEffect(() => {
-        function calculateTTL() {
-            if (!room) return;
+        function syncTTL() {
             setTTL(Math.floor((room.expiredAt.getTime() - Date.now()) / 1000));
         }
 
-        window.addEventListener("focus", calculateTTL);
-        calculateTTL();
-
-        return () => {
-            window.removeEventListener("focus", calculateTTL);
-        };
+        window.addEventListener("focus", syncTTL);
+        return () => window.removeEventListener("focus", syncTTL);
     }, [room]);
 
     useEffect(() => {

@@ -1,9 +1,10 @@
-import { headers } from "next/headers";
-import ResetUserIdentity from "./ResetUserIdentity";
+"use client";
 
-export default async function UserIdentity() {
-    const userId = (await headers()).get("user-id");
-    if (!userId) throw new Error("User ID not found");
+import ResetUserIdentity from "./ResetUserIdentity";
+import { useUserId } from "./UserIdProvider";
+
+export default function UserIdentity() {
+    const { userId } = useUserId();
 
     return (
         <div>

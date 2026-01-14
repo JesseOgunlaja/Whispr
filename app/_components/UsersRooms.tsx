@@ -1,28 +1,20 @@
 "use client";
 
-import { api, formatMessageDate } from "@/lib/lib";
+import { formatMessageDate } from "@/lib/lib";
 import styles from "@/styles/home.module.css";
-import { useQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-export default function UsersRooms() {
-    const { data: res, isLoading } = useQuery({
-        queryKey: ["rooms"],
-        queryFn: () => api.user.rooms.get(),
-    });
-
+export default function UsersRooms({
+    rooms,
+}: {
+    rooms: { id: string; lastUsed: Date }[];
+}) {
     return (
         <aside className={styles.aside}>
-            <p>
-                {isLoading
-                    ? "Loading rooms"
-                    : res?.data?.rooms.length === 0
-                    ? "No open rooms"
-                    : "Open Rooms"}
-            </p>
+            <p>{rooms.length === 0 ? "No open rooms" : "Open Rooms"}</p>
             <ul>
-                {res?.data?.rooms.map((room) => (
+                {rooms.map((room) => (
                     <li key={room.id}>
                         <Link href={`/room/${room.id}`}>
                             <div>

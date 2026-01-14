@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRoomId } from "../_hooks/useRoomId";
+import { useRoom } from "./RoomProvider";
 
 export default function RoomID() {
-    const roomId = useRoomId();
+    const { room } = useRoom();
     const [copied, setCopied] = useState(false);
 
     function copyRoomId() {
         navigator.clipboard.writeText(
-            `${window.location.origin}/room/${roomId}`
+            `${window.location.origin}/room/${room.id}`
         );
 
         setCopied(true);
@@ -22,10 +22,9 @@ export default function RoomID() {
         return () => clearTimeout(t);
     }, [copied]);
 
-    if (!roomId) return null;
     return (
         <div>
-            <p>{roomId}</p>
+            <p>{room.id}</p>
             <button onClick={copyRoomId} disabled={copied}>
                 {copied ? "COPIED" : "COPY"}
             </button>

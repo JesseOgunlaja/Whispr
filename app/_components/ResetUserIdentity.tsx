@@ -6,18 +6,19 @@ import {
 } from "@/lib/crypto/primitives";
 import { api } from "@/lib/lib";
 import styles from "@/styles/home.module.css";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useUserId } from "./UserIdProvider";
 
 export default function ResetUserIdentity() {
+    const { setUserId } = useUserId();
     const router = useRouter();
-    const queryClient = useQueryClient();
     const [isRefreshing, setIsRefreshing] = useState(false);
     const { mutate: resetIdentity } = useMutation({
         mutationFn: async () => {
-            await Promise.all([
+            return await Promise.all([
                 generateEncryptionKeys(),
                 generateSigningKeys(),
                 api.user.reset.post(),
@@ -27,9 +28,9 @@ export default function ResetUserIdentity() {
             setIsRefreshing(true);
             setTimeout(() => setIsRefreshing(false), 1000);
         },
-        onSuccess: () => {
+        onSuccess: (res) => {
             router.refresh();
-            queryClient.setQueryData(["rooms"], []);
+            setUserId(res[2].data!.userId);
         },
     });
 

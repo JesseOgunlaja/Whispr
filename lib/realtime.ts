@@ -1,10 +1,10 @@
 import { produce } from "immer";
 import { toast } from "sonner";
 import z from "zod";
-import { RealtimeHandlers, RoomQueryData } from "./types";
+import { RealtimeHandlers } from "./types";
 
 export const handlers: RealtimeHandlers = {
-    "user-joined": (data, { userId, roomId, queryClient }) => {
+    "user-joined": (data, { userId, setRoom }) => {
         const {
             userId: joinedUserId,
             encryptionKey,
@@ -14,26 +14,24 @@ export const handlers: RealtimeHandlers = {
 
         toast.info(`User ${joinedUserId.slice(0, 5)} joined the room`);
 
-        queryClient.setQueryData(["room", roomId], (old: RoomQueryData) => {
-            if (!old.data) return old;
+        setRoom((old) => {
             return produce(old, (draft) => {
-                draft.data.room.users.push(joinedUserId);
-                draft.data.room.publicKeys[joinedUserId] = {
+                draft.users.push(joinedUserId);
+                draft.publicKeys[joinedUserId] = {
                     encryptionKey,
                     signingKey,
                 };
             });
         });
     },
-    "room-destroyed": (_, { router }) => {
-        router.push("/?info=Room destroyed");
+    "room-destroyed": (actor, { router, userId }) => {
+        if (actor !== userId) router.push("/?info=Room destroyed");
     },
-    "new-message": (data, { roomId, queryClient }) => {
+    "new-message": (data, { setRoom }) => {
         const message = newMessageSchema.parse(JSON.parse(data));
-        queryClient.setQueryData(["room", roomId], (old: RoomQueryData) => {
-            if (!old.data) return old;
+        setRoom((old) => {
             return produce(old, (draft) => {
-                draft.data.room.messages.push(message);
+                draft.messages.push(message);
             });
         });
     },

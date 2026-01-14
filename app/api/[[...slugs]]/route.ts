@@ -3,7 +3,6 @@ import { Elysia } from "elysia";
 import { AuthError } from "./auth";
 import { startRoomCleanup } from "./cleanup";
 import { messages } from "./messages";
-import { realtime } from "./realtime";
 import { rooms } from "./rooms";
 import { users } from "./user";
 
@@ -37,7 +36,6 @@ export const app = new Elysia({ prefix: "/api" })
     })
     .use(users)
     .use(rooms)
-    .use(realtime)
     .use(messages);
 
 startRoomCleanup();

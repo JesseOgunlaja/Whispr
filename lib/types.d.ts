@@ -1,4 +1,5 @@
-import { Message } from "./db/schema";
+import { Dispatch, SetStateAction } from "react";
+import { Message, Room } from "./db/schema";
 import { api } from "./lib";
 
 export interface DecryptedMessage extends Message {
@@ -30,8 +31,7 @@ export type RealtimeHandlers = {
         payload: string,
         ctx: {
             userId: string;
-            roomId: string;
-            queryClient: QueryClient;
+            setRoom: Dispatch<SetStateAction<Room>>;
             router: AppRouterInstance;
         }
     ) => void;

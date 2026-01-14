@@ -1,9 +1,10 @@
-import PublicKeysProvider from "@/app/_components/PublicKeysProvider";
 import QueryProvider from "@/app/_components/QueryProvider";
+import { getUserIdHeader } from "@/lib/server-lib";
 import { ChildrenProps } from "@/lib/types";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import ToastProvider from "./_components/ToastProvider";
+import UserIdProvider from "./_components/UserIdProvider";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -31,14 +32,17 @@ export const metadata: Metadata = {
     creator: "Jesse Ogunlaja",
 };
 
-export default function RootLayout({ children }: ChildrenProps) {
+export default async function RootLayout({ children }: ChildrenProps) {
+    const userId = await getUserIdHeader();
+    if (!userId) throw new Error("User ID not found");
+
     return (
         <html lang="en">
             <body className={poppins.className}>
                 <link rel="icon" href="/favicon.ico" />
                 <ToastProvider />
                 <QueryProvider>
-                    <PublicKeysProvider>{children}</PublicKeysProvider>
+                    <UserIdProvider userId={userId}>{children}</UserIdProvider>
                 </QueryProvider>
             </body>
         </html>

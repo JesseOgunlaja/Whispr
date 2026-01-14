@@ -13,6 +13,6 @@ export default async function proxy(request: NextRequest) {
         response.cookies.set(getTokenCookieConfig(token));
     }
 
-    response.headers.set("user-id", userId);
+    response.headers.set("x-user-id", userId);
     return response;
 }

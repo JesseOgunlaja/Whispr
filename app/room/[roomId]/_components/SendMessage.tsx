@@ -2,12 +2,14 @@
 
 import { encryptMessage } from "@/lib/crypto/encryption";
 import { FormEvent, useRef, useState } from "react";
+import { useRoom } from "../_components/RoomProvider";
 import { useSendMessage } from "../_hooks/useSendMessage";
-import { useRoomSession } from "./RoomSessionProvider";
+import { useRoomInteraction } from "./RoomInteractionProvider";
 
 export default function SendMessage() {
     const inputRef = useRef<HTMLInputElement>(null);
-    const { room, userId, signature, sharedKey } = useRoomSession();
+    const { sharedKey } = useRoomInteraction();
+    const { room } = useRoom();
     const [message, setMessage] = useState("");
     const { mutateAsync: sendMessage } = useSendMessage(message);
 
@@ -23,8 +25,7 @@ export default function SendMessage() {
         }
     }
 
-    const isFormDisabled =
-        room?.users.length !== 2 || !signature || !userId || !sharedKey;
+    const isFormDisabled = room?.users.length !== 2 || !sharedKey;
 
     return (
         <footer>
@@ -35,9 +36,9 @@ export default function SendMessage() {
                     placeholder={
                         room?.users.length === 2
                             ? "Send a message"
-                            : !signature
-                            ? "Loading"
-                            : "Waiting for second user to join"
+                            : !room?.users.length
+                              ? "Loading"
+                              : "Waiting for second user to join"
                     }
                     type="text"
                     value={message}

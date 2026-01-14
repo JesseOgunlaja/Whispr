@@ -1,17 +1,17 @@
 import { decryptMessage } from "@/lib/crypto/encryption";
 import { DecryptedMessage } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
-import { useRoomSession } from "../_components/RoomSessionProvider";
+import { useRoomInteraction } from "../_components/RoomInteractionProvider";
+import { useRoom } from "../_components/RoomProvider";
 
 export function useDecryptMessages() {
     const decryptedMessagesCache = useRef(new Map<string, string>());
     const [messages, setMessages] = useState<DecryptedMessage[]>([]);
-    const { room, userId, sharedKey, removeDuplicatedMessages } =
-        useRoomSession();
+    const { room } = useRoom();
+    const { sharedKey, removeDuplicatedMessages } = useRoomInteraction();
 
     useEffect(() => {
-        if (!room?.messages || room.users.length !== 2 || !userId || !sharedKey)
-            return;
+        if (room?.users.length !== 2 || !sharedKey) return;
 
         (async () => {
             const messages = await Promise.all(
@@ -40,7 +40,7 @@ export function useDecryptMessages() {
             removeDuplicatedMessages();
             setMessages(messages);
         })();
-    }, [room, userId, sharedKey, removeDuplicatedMessages]);
+    }, [room, sharedKey, removeDuplicatedMessages]);
 
     return messages;
 }

@@ -1,34 +1,40 @@
-import { usePublicKeys } from "@/app/_components/PublicKeysProvider";
 import { useToastMutation } from "@/hooks/useToastMutation";
+import { getPublicKeys } from "@/lib/crypto/keyManager";
 import { api } from "@/lib/lib";
-import { RoomQueryData } from "@/lib/types";
-import { useQueryClient } from "@tanstack/react-query";
-import { produce } from "immer";
+import { BackendError } from "@/lib/types";
 import { useRouter } from "next/navigation";
-import { useRoomId } from "./useRoomId";
+import { useRoom } from "../_components/RoomProvider";
 
 export function useJoinRoom() {
     const router = useRouter();
-    const roomId = useRoomId();
-    const { encryptionKey, signingKey } = usePublicKeys();
-    const queryClient = useQueryClient();
+    const { room, setRoom } = useRoom();
 
     return useToastMutation(
         {
             mutationFn: async () => {
-                if (!encryptionKey || !signingKey || !roomId) {
+                const { encryptionKey, signingKey } = await getPublicKeys();
+                if (!encryptionKey || !signingKey) {
                     throw new Error("Waiting for data");
                 }
 
-                const { data } = await api.room.join({ roomId }).post(null, {
-                    query: {
-                        encryptionKey,
-                        signingKey,
-                    },
-                });
+                const { data, error } = await api.room
+                    .join({ roomId: room.id })
+                    .post(null, {
+                        query: {
+                            encryptionKey,
+                            signingKey,
+                        },
+                    });
 
-                if (!data?.room) {
-                    throw new Error("Failed to join room, redirecting...");
+                if (!data?.room || error) {
+                    const parsedError = error?.value as BackendError;
+                    if (
+                        parsedError.type === "ratelimit" ||
+                        parsedError.type === "auth"
+                    ) {
+                        throw new Error(parsedError.message);
+                    }
+                    throw new Error("Failed to join room");
                 }
 
                 return {
@@ -36,23 +42,9 @@ export function useJoinRoom() {
                     ...data,
                 };
             },
-            onError: () => router.push("/?error=Failed to join room"),
+            onError: () => router.push("/"),
             onSuccess: (data) => {
-                queryClient.setQueryData(
-                    ["room", roomId],
-                    (old: RoomQueryData) => {
-                        const next = produce(old, (draft) => {
-                            draft.data = {
-                                success: true,
-                                room: data.room,
-                                userId: data.userId,
-                            };
-                            draft.error = null;
-                        });
-
-                        return next satisfies RoomQueryData;
-                    }
-                );
+                setRoom(data.room);
             },
         },
         "Joining room..."

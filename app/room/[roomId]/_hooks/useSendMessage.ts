@@ -4,22 +4,24 @@ import { BackendError } from "@/lib/types";
 import { useMutation } from "@tanstack/react-query";
 import { startTransition } from "react";
 import { toast } from "sonner";
-import { useRoomSession } from "../_components/RoomSessionProvider";
+import { useRoomInteraction } from "../_components/RoomInteractionProvider";
+import { useRoom } from "../_components/RoomProvider";
 
 export function useSendMessage(message: string) {
-    const { room, signature, addOptimisticMessage, removeOptimisticMessage } =
-        useRoomSession();
+    const { room } = useRoom();
+    const { addOptimisticMessage, removeOptimisticMessage } =
+        useRoomInteraction();
 
     return useMutation({
         mutationFn: ({
             ciphertext,
             iv,
         }: Pick<Message, "ciphertext" | "iv">) => {
-            if (!room || !signature) throw new Error("Waiting for data");
+            if (!room) throw new Error("Waiting for data");
 
             return api.messages
                 .send({ roomId: room.id })
-                .post({ ciphertext, iv }, { query: signature });
+                .post({ ciphertext, iv });
         },
         onMutate: ({ ciphertext, iv }) => {
             startTransition(() => {

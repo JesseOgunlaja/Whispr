@@ -1,23 +1,22 @@
 "use client";
 
 import { useToastMutation } from "@/hooks/useToastMutation";
+import { createSignature } from "@/lib/crypto/signing";
 import { api } from "@/lib/lib";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRoomId } from "../_hooks/useRoomId";
-import { useRoomSession } from "./RoomSessionProvider";
+import { useRoom } from "./RoomProvider";
 
 export default function DestroyRoom() {
-    const roomId = useRoomId();
     const router = useRouter();
-    const { signature } = useRoomSession();
+    const { room } = useRoom();
     const { mutate: deleteRoom, isPending: isDeleting } = useToastMutation(
         {
             mutationFn: async () => {
-                if (!roomId || !signature) throw new Error("Waiting for data");
+                const signature = await createSignature(room.id);
 
                 const { data } = await api.room
-                    .destroy({ roomId })
+                    .destroy({ roomId: room.id })
                     .post(null, { query: signature });
 
                 if (!data?.success) throw new Error("Failed to destroy room");
@@ -32,10 +31,7 @@ export default function DestroyRoom() {
     );
 
     return (
-        <button
-            disabled={isDeleting || !roomId || !signature}
-            onClick={deleteRoom}
-        >
+        <button disabled={isDeleting} onClick={deleteRoom}>
             <Trash2 />
             <p>Destroy Room</p>
         </button>

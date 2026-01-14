@@ -2,19 +2,16 @@ import { getPrivateSigningKey } from "./keyManager";
 import { sign, verify } from "./primitives";
 import { toArrayBuffer, toBase64 } from "./utils";
 
+const signatureWindow = 1000;
+
 export async function createSignature(roomId: string) {
     const privateKey = await getPrivateSigningKey();
-    const window = Math.floor(Date.now() / (60 * 1000)).toString();
+    const window = Math.floor(Date.now() / signatureWindow).toString();
 
     const payload = JSON.stringify({ window, roomId });
 
     const signature = await sign(payload, privateKey);
     return { window, signature: toBase64(signature) };
-}
-
-export function validWindow(window: string) {
-    const nowWindow = Math.floor(Date.now() / (60 * 1000));
-    return Math.abs(nowWindow - Number(window)) <= 1;
 }
 
 export async function verifySignature(
@@ -23,8 +20,7 @@ export async function verifySignature(
     window: string,
     roomId: string
 ) {
-    const nowWindow = Math.floor(Date.now() / (60 * 1000));
-
+    const nowWindow = Math.floor(Date.now() / signatureWindow);
     if (Math.abs(nowWindow - Number(window)) > 1) return false;
 
     const publicKey = await crypto.subtle.importKey(

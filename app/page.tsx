@@ -1,11 +1,19 @@
 import QueryParamHandler from "@/app/_components/QueryParamHandler";
 import UserIdentity from "@/app/_components/UserIdentity";
+import { getUsersRooms } from "@/lib/db/dal";
+import { getUserIdHeader } from "@/lib/server-lib";
 import styles from "@/styles/home.module.css";
-import { Suspense } from "react";
 import CreateRoom from "./_components/CreateRoom";
 import UsersRooms from "./_components/UsersRooms";
 
 export default async function Home() {
+    const rooms = (await getUsersRooms(await getUserIdHeader())).map(
+        ({ id, messages }) => ({
+            id,
+            lastUsed: messages[0]?.createdAt,
+        })
+    );
+
     return (
         <div className={styles.page}>
             <QueryParamHandler />
@@ -14,13 +22,11 @@ export default async function Home() {
                 <p>A private, self-destructing chat app with E2EE</p>
                 <div>
                     <p>Your Identity</p>
-                    <Suspense fallback={<div>anonymous-...</div>}>
-                        <UserIdentity />
-                    </Suspense>
+                    <UserIdentity />
                     <CreateRoom />
                 </div>
             </main>
-            <UsersRooms />
+            <UsersRooms rooms={rooms} />
         </div>
     );
 }

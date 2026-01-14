@@ -1,13 +1,15 @@
 "use client";
 
+import { useUserId } from "@/app/_components/UserIdProvider";
 import { formatMessageDate } from "@/lib/lib";
 import styles from "@/styles/room.module.css";
 import { useEffect, useRef } from "react";
 import { useDecryptMessages } from "../_hooks/useDecryptMessages";
-import { useRoomSession } from "./RoomSessionProvider";
+import { useRoomInteraction } from "./RoomInteractionProvider";
 
 export default function MessagesList() {
-    const { userId, optimisticMessages } = useRoomSession();
+    const { userId } = useUserId();
+    const { optimisticMessages } = useRoomInteraction();
     const chatRef = useRef<HTMLUListElement>(null);
     const messages = useDecryptMessages();
 

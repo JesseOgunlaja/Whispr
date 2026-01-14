@@ -38,7 +38,13 @@ export async function getUsersRooms(userId: string) {
             arrayContains(rooms.users, [userId]),
             lt(sql`NOW()`, rooms.expiredAt)
         ),
-        with: { messages: true },
+        with: {
+            messages: {
+                columns: { createdAt: true },
+                orderBy: (messages, { desc }) => [desc(messages.createdAt)],
+                limit: 1,
+            },
+        },
     });
 }
 

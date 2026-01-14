@@ -1,7 +1,7 @@
 import { createRoom, deleteRoom, updateRoom } from "@/lib/db/dal";
 import { isLikelyBase64Key, nanoid } from "@/lib/lib";
 import { ratelimit, roomRatelimit } from "@/lib/ratelimit";
-import { createWebsocketStream } from "@/lib/server-lib";
+import { createWebsocketStream, runInBackground } from "@/lib/server-lib";
 import { Elysia, t } from "elysia";
 import { AuthError, isUserAuthorized, loadRoom, loadUser } from "./auth";
 
@@ -39,9 +39,10 @@ export const rooms = new Elysia({ prefix: "/room" })
     .post(
         "/join/:roomId",
         async ({ room, userId, query, request }) => {
+            const stream = createWebsocketStream();
             if (room.users.includes(userId)) return { success: true };
             if (room.users.length > 1) throw new AuthError("Room full");
-            await ratelimit(roomRatelimit, request, room.id);
+            await ratelimit(roomRatelimit, request);
 
             const { encryptionKey, signingKey } = query;
 
@@ -57,6 +58,7 @@ export const rooms = new Elysia({ prefix: "/room" })
                 encryptionKey,
                 signingKey,
             };
+
             await updateRoom(
                 {
                     users: room.users,
@@ -65,14 +67,13 @@ export const rooms = new Elysia({ prefix: "/room" })
                 room.id
             );
 
-            setTimeout(async () => {
-                const stream = await createWebsocketStream();
-                stream.send(
+            runInBackground(async () => {
+                (await stream).send(
                     room.id,
                     "user-joined",
                     JSON.stringify({ userId, encryptionKey, signingKey })
                 );
-            }, 0);
+            });
 
             return { success: true, room, userId };
         },
@@ -84,16 +85,13 @@ export const rooms = new Elysia({ prefix: "/room" })
         }
     )
     .use(isUserAuthorized)
-    .get("/:roomId", async ({ room, userId }) => {
-        return { success: true, room, userId };
-    })
-    .post("/destroy/:roomId", async ({ room }) => {
+    .post("/destroy/:roomId", async ({ room, userId }) => {
+        const stream = createWebsocketStream();
         await deleteRoom(room.id);
 
-        setTimeout(async () => {
-            const stream = await createWebsocketStream();
-            stream.send(room.id, "room-destroyed", "");
-        }, 0);
+        runInBackground(async () => {
+            (await stream).send(room.id, "room-destroyed", userId);
+        });
 
         return { success: true };
     });

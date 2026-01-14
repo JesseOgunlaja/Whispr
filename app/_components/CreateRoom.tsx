@@ -1,20 +1,17 @@
 "use client";
 
 import { useToastMutation } from "@/hooks/useToastMutation";
+import { getPublicKeys } from "@/lib/crypto/keyManager";
 import { api } from "@/lib/lib";
 import { BackendError } from "@/lib/types";
 import { useRouter } from "next/navigation";
-import { usePublicKeys } from "./PublicKeysProvider";
 
 export default function CreateRoom() {
     const router = useRouter();
-    const { encryptionKey, signingKey } = usePublicKeys();
     const { mutate: createRoom, isPending } = useToastMutation(
         {
             mutationFn: async () => {
-                if (!encryptionKey || !signingKey) {
-                    throw new Error("Waiting for keys");
-                }
+                const { encryptionKey, signingKey } = await getPublicKeys();
 
                 const res = await api.room.create.post({
                     encryptionKey,
@@ -39,10 +36,7 @@ export default function CreateRoom() {
     );
 
     return (
-        <button
-            onClick={createRoom}
-            disabled={!encryptionKey || !signingKey || isPending}
-        >
+        <button onClick={createRoom} disabled={isPending}>
             Create Room
         </button>
     );

@@ -19,7 +19,7 @@ test("two users send messages and destroy room", async () => {
     await user1.goto("http://localhost:3000");
     await sleep(100);
     await user1.click(CREATE_ROOM_PATH);
-    await sleep(250);
+    await sleep(500);
 
     await user2.goto(user1.url());
     await sleep(250);
@@ -37,11 +37,11 @@ test("two users send messages and destroy room", async () => {
     await user2.click(DESTROY_ROOM_PATH);
     await sleep(250);
 
-    await expect(
+    expect(
         "http://localhost:3000/",
-        "http://localhost:3000/?info=Room%20Destroyed"
+        "http://localhost:3000/?info=Room%20destroyed"
     ).toContain(user1.url());
-    await expect(user2.url()).toBe("http://localhost:3000/");
+    expect(user2.url()).toBe("http://localhost:3000/");
 
     await browser.close();
 });

@@ -5,11 +5,11 @@ import styles from "@/styles/home.module.css";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-export default function UsersRooms({
-    rooms,
-}: {
+interface PropsType {
     rooms: { id: string; lastUsed: Date }[];
-}) {
+}
+
+export default function UsersRooms({ rooms }: PropsType) {
     return (
         <aside className={styles.aside}>
             <p>{rooms.length === 0 ? "No open rooms" : "Open Rooms"}</p>

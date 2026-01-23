@@ -30,7 +30,7 @@ export const loadRoom = new Elysia({ name: "load-room" })
         params: t.Object({ roomId: t.String() }),
     })
     .derive(async ({ params: { roomId } }) => {
-        const room = await getRoomById(roomId);
+        const room = await getRoomById(roomId, false);
         if (!room) throw new AuthError("Room not found");
 
         return { room };
@@ -62,7 +62,7 @@ export const isUserAuthorized = new Elysia({ name: "user-authorized" })
             query.signature,
             room.publicKeys[userId].signingKey,
             query.window,
-            room.id
+            room.id,
         );
 
         if (!validSignature) throw new AuthError("Invalid signature");

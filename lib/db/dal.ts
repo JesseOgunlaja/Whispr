@@ -2,11 +2,14 @@ import { and, arrayContains, eq, lt, sql } from "drizzle-orm";
 import { db } from "./db";
 import { Message, messages, Room, rooms } from "./schema";
 
-export async function getRoomById(roomId: string) {
-    return await db.query.rooms.findFirst({
+export async function getRoomById<T extends boolean>(
+    roomId: string,
+    withMessages: T,
+): Promise<(T extends true ? Room : Omit<Room, "messages">) | null> {
+    return (await db.query.rooms.findFirst({
         where: and(eq(rooms.id, roomId), lt(sql`NOW()`, rooms.expiredAt)),
-        with: { messages: true },
-    });
+        with: withMessages ? { messages: true } : undefined,
+    })) as (T extends true ? Room : Omit<Room, "messages">) | null;
 }
 
 export async function createRoom(room: Omit<Room, "expiredAt" | "messages">) {
@@ -14,14 +17,9 @@ export async function createRoom(room: Omit<Room, "expiredAt" | "messages">) {
 }
 
 export async function createMessage(
-    message: Omit<Message, "id" | "createdAt">
+    message: Omit<Message, "id" | "createdAt">,
 ) {
-    return (
-        await db
-            .insert(messages)
-            .values(message)
-            .returning({ id: messages.id, createdAt: messages.createdAt })
-    )[0];
+    return (await db.insert(messages).values(message).returning())[0];
 }
 
 export async function updateRoom(room: Partial<Room>, roomId: string) {
@@ -36,15 +34,9 @@ export async function getUsersRooms(userId: string) {
     return await db.query.rooms.findMany({
         where: and(
             arrayContains(rooms.users, [userId]),
-            lt(sql`NOW()`, rooms.expiredAt)
+            lt(sql`NOW()`, rooms.expiredAt),
         ),
-        with: {
-            messages: {
-                columns: { createdAt: true },
-                orderBy: (messages, { desc }) => [desc(messages.createdAt)],
-                limit: 1,
-            },
-        },
+        columns: { id: true, lastActive: true },
     });
 }
 

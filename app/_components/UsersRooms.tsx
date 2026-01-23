@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface PropsType {
-    rooms: { id: string; lastUsed: Date }[];
+    rooms: { id: string; lastActive: Date | null }[];
 }
 
 export default function UsersRooms({ rooms }: PropsType) {
@@ -21,8 +21,8 @@ export default function UsersRooms({ rooms }: PropsType) {
                                 <span>{room.id}</span>
                                 <span>
                                     Last used:{" "}
-                                    {room.lastUsed
-                                        ? formatMessageDate(room.lastUsed)
+                                    {room.lastActive
+                                        ? formatMessageDate(room.lastActive)
                                         : "Never"}
                                 </span>
                             </div>

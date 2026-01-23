@@ -19,13 +19,14 @@ export const rooms = pgTable(
             .default(sql`NOW() + INTERVAL '10 minutes'`)
             .notNull(),
         users: jsonb().$type<string[]>().notNull(),
+        lastActive: timestamp("last_active"),
         publicKeys: json("public_keys")
             .$type<
                 Record<string, { encryptionKey: string; signingKey: string }>
             >()
             .notNull(),
     },
-    (t) => [check("rooms_max_users", sql`jsonb_array_length(${t.users}) <= 2`)]
+    (t) => [check("rooms_max_users", sql`jsonb_array_length(${t.users}) <= 2`)],
 );
 
 const _roomSchema = createSelectSchema(rooms);

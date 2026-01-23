@@ -7,12 +7,7 @@ import CreateRoom from "./_components/CreateRoom";
 import UsersRooms from "./_components/UsersRooms";
 
 export default async function Home() {
-    const rooms = (await getUsersRooms(await getUserIdHeader())).map(
-        ({ id, messages }) => ({
-            id,
-            lastUsed: messages[0]?.createdAt,
-        })
-    );
+    const rooms = await getUsersRooms(await getUserIdHeader());
 
     return (
         <div className={styles.page}>

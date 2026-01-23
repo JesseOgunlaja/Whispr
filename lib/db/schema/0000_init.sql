@@ -9,10 +9,15 @@ CREATE TABLE IF NOT EXISTS "messages" (
 );
 
 CREATE TABLE IF NOT EXISTS "rooms" (
+    "last_active" timestamp NULL,
     "id" text PRIMARY KEY NOT NULL,
     "expired_at" timestamp DEFAULT NOW() + INTERVAL '10 minutes' NOT NULL,
     "users" jsonb NOT NULL,
     "public_keys" json NOT NULL
+);
+
+ALTER TABLE messages SET (
+  autovacuum_vacuum_insert_scale_factor = 0.02
 );
 
 DO $$

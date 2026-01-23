@@ -1,3 +1,4 @@
+import { AuthError } from "@/app/api/[[...slugs]]/auth";
 import { getPrivateSigningKey } from "./keyManager";
 import { sign, verify } from "./primitives";
 import { toArrayBuffer, toBase64 } from "./utils";
@@ -18,7 +19,7 @@ export async function verifySignature(
     signature: string,
     publicKeyBase64: string,
     window: string,
-    roomId: string
+    roomId: string,
 ) {
     const nowWindow = Math.floor(Date.now() / signatureWindow);
     if (Math.abs(nowWindow - Number(window)) > 1) return false;
@@ -28,10 +29,11 @@ export async function verifySignature(
         toArrayBuffer(publicKeyBase64),
         { name: "ECDSA", namedCurve: "P-256" },
         false,
-        ["verify"]
+        ["verify"],
     );
 
     const payload = JSON.stringify({ window, roomId });
 
-    return await verify(payload, signature, publicKey);
+    const isValidSignature = await verify(payload, signature, publicKey);
+    if (!isValidSignature) throw new AuthError("Invalid signature");
 }

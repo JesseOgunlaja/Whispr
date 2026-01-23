@@ -15,7 +15,7 @@ class Ratelimit {
             time: number;
             maxRequests: number;
             prefix: string;
-        }
+        },
     ) {}
 
     async limit(suffix: string) {
@@ -42,15 +42,15 @@ export const messageRatelimit = new Ratelimit({
 });
 
 export const roomRatelimit = new Ratelimit({
-    time: 600,
-    maxRequests: 3,
+    time: 60,
+    maxRequests: 10,
     prefix: "room-ratelimit",
 });
 
 export async function ratelimit(
     ratelimit: Ratelimit,
     request: Request,
-    key?: string
+    key?: string,
 ) {
     const ip = getClientIp(request);
     if (!ip) throw new ParseError(Error("Failed to get client IP"));

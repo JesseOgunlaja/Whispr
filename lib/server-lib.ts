@@ -23,7 +23,7 @@ export function getClientIp(request: Request) {
     const realIp = headers.get("x-real-ip");
     if (realIp) return realIp;
 
-    return null;
+    if (request.url.includes("localhost:3000")) return "127.0.0.1";
 }
 
 export async function runInBackground(fn: () => Promise<void>) {

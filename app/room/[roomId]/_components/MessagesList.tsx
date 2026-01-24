@@ -5,11 +5,9 @@ import { formatMessageDate } from "@/lib/lib";
 import styles from "@/styles/room.module.css";
 import { useEffect, useRef } from "react";
 import { useDecryptMessages } from "../_hooks/useDecryptMessages";
-import { useRoomInteraction } from "./RoomInteractionProvider";
 
 export default function MessagesList() {
     const { userId } = useUserId();
-    const { optimisticMessages } = useRoomInteraction();
     const chatRef = useRef<HTMLUListElement>(null);
     const messages = useDecryptMessages();
 
@@ -23,10 +21,9 @@ export default function MessagesList() {
         <main>
             <ul ref={chatRef}>
                 {messages
-                    .concat(optimisticMessages)
                     .sort(
                         (a, b) =>
-                            +new Date(a.createdAt) - +new Date(b.createdAt)
+                            +new Date(a.createdAt) - +new Date(b.createdAt),
                     )
                     .map((message) => (
                         <li key={message.id}>
@@ -41,7 +38,7 @@ export default function MessagesList() {
                                     ? "Me"
                                     : `anonymous-${message.userId.slice(
                                           0,
-                                          5
+                                          5,
                                       )}`}{" "}
                                 <span>
                                     {formatMessageDate(message.createdAt)}

@@ -2,7 +2,6 @@ import { globalRatelimit, ratelimit, RatelimitError } from "@/lib/ratelimit";
 import { Elysia } from "elysia";
 import { AuthError } from "./auth";
 import { startRoomCleanup } from "./cleanup";
-import { messages } from "./messages";
 import { rooms } from "./rooms";
 import { users } from "./user";
 
@@ -35,8 +34,7 @@ export const app = new Elysia({ prefix: "/api" })
         await ratelimit(globalRatelimit, request);
     })
     .use(users)
-    .use(rooms)
-    .use(messages);
+    .use(rooms);
 
 startRoomCleanup();
 

@@ -3,22 +3,22 @@
 import { encryptMessage } from "@/lib/crypto/encryption";
 import { FormEvent, useRef, useState } from "react";
 import { useRoom } from "../_components/RoomProvider";
-import { useSendMessage } from "../_hooks/useSendMessage";
-import { useRoomInteraction } from "./RoomInteractionProvider";
+import { useSharedKey } from "../_hooks/useSharedKey";
+import { useRoomRealtime } from "./RoomRealtimeProvider";
 
 export default function SendMessage() {
     const inputRef = useRef<HTMLInputElement>(null);
-    const { sharedKey } = useRoomInteraction();
+    const sharedKey = useSharedKey();
+    const { sendSocketMessage } = useRoomRealtime();
     const { room } = useRoom();
     const [message, setMessage] = useState("");
-    const { mutateAsync: sendMessage } = useSendMessage(message);
 
     async function formSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const trimmed = message.trim();
         if (!isFormDisabled && trimmed) {
-            const { iv, ciphertext } = await encryptMessage(sharedKey, trimmed);
-            sendMessage({ ciphertext, iv });
+            const encrypted = await encryptMessage(sharedKey, trimmed);
+            sendSocketMessage({ type: "message", data: encrypted });
 
             setMessage("");
             inputRef.current?.focus();

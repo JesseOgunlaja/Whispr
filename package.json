@@ -7,7 +7,8 @@
         "dev": "docker-compose -p whispr -f docker/docker-compose.dev.yaml up --build",
         "start": "docker-compose -f docker/docker-compose.yaml up",
         "test": "playwright install chromium && playwright test",
-        "lint": "eslint ."
+        "lint": "eslint .",
+        "prepare": "next-ws patch"
     },
     "dependencies": {
         "@elysiajs/eden": "^1.4.6",
@@ -25,11 +26,13 @@
         "lucide-react": "^0.561.0",
         "nanoid": "^5.1.6",
         "next": "^16.1.1",
+        "next-ws": "^2.1.13",
         "pg": "^8.16.3",
         "react": "^19.2.3",
         "react-dom": "^19.2.3",
         "sonner": "^2.0.7",
         "streamthing": "^7.1.1",
+        "ws": "^8.19.0",
         "zod": "^4.3.4"
     },
     "devDependencies": {
@@ -38,6 +41,7 @@
         "@types/pg": "^8.16.0",
         "@types/react": "^19.2.7",
         "@types/react-dom": "^19.2.3",
+        "@types/ws": "^8.18.1",
         "babel-plugin-react-compiler": "1.0.0",
         "eslint": "^9.39.2",
         "eslint-config-next": "^16.1.1",

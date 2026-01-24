@@ -5,11 +5,7 @@ import { RealtimeHandlers } from "./types";
 
 export const handlers: RealtimeHandlers = {
     "user-joined": (data, { userId, setRoom }) => {
-        const {
-            userId: joinedUserId,
-            encryptionKey,
-            signingKey,
-        } = userJoinedSchema.parse(JSON.parse(data));
+        const { userId: joinedUserId, encryptionKey, signingKey } = data;
         if (userId === joinedUserId) return;
 
         toast.info(`User ${joinedUserId.slice(0, 5)} joined the room`);
@@ -24,30 +20,47 @@ export const handlers: RealtimeHandlers = {
             });
         });
     },
-    "room-destroyed": (actor, { router, userId }) => {
-        if (actor !== userId) router.push("/?info=Room destroyed");
+    "room-destroyed": (_, { router }) => {
+        router.push("/?info=Room destroyed");
     },
-    "new-message": (data, { setRoom }) => {
-        const message = newMessageSchema.parse(JSON.parse(data));
+    "new-message": (message, { setRoom }) => {
         setRoom((old) => {
             return produce(old, (draft) => {
                 draft.messages.push(message);
             });
         });
     },
+    error: (error) => {
+        if (typeof error === "string") toast.error(error);
+    },
 };
 
-const userJoinedSchema = z.object({
-    userId: z.string(),
-    encryptionKey: z.string(),
-    signingKey: z.string(),
-});
-
-const newMessageSchema = z.object({
-    id: z.number(),
-    createdAt: z.string().transform((str) => new Date(str)),
-    roomId: z.string(),
-    ciphertext: z.string(),
-    userId: z.string(),
-    iv: z.string(),
-});
+export const clientSocketMessageSchema = z.discriminatedUnion("type", [
+    z.object({
+        type: z.literal("user-joined"),
+        payload: z.object({
+            userId: z.string(),
+            encryptionKey: z.string(),
+            signingKey: z.string(),
+        }),
+    }),
+    z.object({
+        type: z.literal("room-destroyed"),
+        payload: z.string(),
+    }),
+    z.object({
+        type: z.literal("new-message"),
+        payload: z.object({
+            id: z.number(),
+            createdAt: z.string().transform((str) => new Date(str)),
+            roomId: z.string(),
+            ciphertext: z.string(),
+            userId: z.string(),
+            iv: z.string(),
+        }),
+    }),
+    z.object({
+        type: z.literal("error"),
+        payload: z.string(),
+    }),
+]);

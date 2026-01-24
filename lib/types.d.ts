@@ -1,6 +1,8 @@
 import { Dispatch, SetStateAction } from "react";
+import z from "zod";
 import { Message, Room } from "./db/schema";
 import { api } from "./lib";
+import { clientSocketMessageSchema } from "./realtime";
 
 export interface DecryptedMessage extends Message {
     content: string;
@@ -26,13 +28,20 @@ export type Signature = {
     window: string;
 };
 
+export type SetRoom = Dispatch<SetStateAction<Room>>;
+
+export type RealtimeHandlerContext = {
+    userId: string;
+    setRoom: SetRoom;
+    router: AppRouterInstance;
+};
+
 export type RealtimeHandlers = {
-    [K in "user-joined" | "new-message" | "room-destroyed"]: (
-        payload: string,
-        ctx: {
-            userId: string;
-            setRoom: Dispatch<SetStateAction<Room>>;
-            router: AppRouterInstance;
-        }
+    [K in z.infer<typeof clientSocketMessageSchema>["type"]]: (
+        payload: Extract<
+            z.infer<typeof clientSocketMessageSchema>,
+            { type: K }
+        >["payload"],
+        ctx: RealtimeHandlerContext,
     ) => void;
 };

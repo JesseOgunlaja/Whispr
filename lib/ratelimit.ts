@@ -42,7 +42,7 @@ export const messageRatelimit = new Ratelimit({
 });
 
 export const roomRatelimit = new Ratelimit({
-    time: 60,
+    time: 600,
     maxRequests: 10,
     prefix: "room-ratelimit",
 });

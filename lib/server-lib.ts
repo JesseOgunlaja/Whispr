@@ -1,15 +1,5 @@
 import { headers } from "next/headers";
 import React from "react";
-import { createServerStream } from "streamthing";
-import { env } from "./env";
-
-export async function createWebsocketStream() {
-    return await createServerStream({
-        id: env.NEXT_PUBLIC_STREAMTHING_SERVER_ID,
-        region: env.NEXT_PUBLIC_STREAMTHING_SERVER_REGION,
-        password: env.STREAMTHING_SERVER_PASSWORD,
-    });
-}
 
 export function getClientIp(request: Request) {
     const { headers } = request;

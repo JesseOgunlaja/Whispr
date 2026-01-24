@@ -7,7 +7,6 @@ services:
             - DATABASE_URL=postgres://postgres:dummy@postgres:5432/postgres
             - JWT_SIGNING_KEY=dummy
             - REDIS_PASSWORD=dummy
-            - STREAMTHING_SERVER_PASSWORD=${STREAMTHING_SERVER_PASSWORD}
         ports:
             - "3000:3000"
         depends_on:

@@ -23,8 +23,6 @@ jobs:
 
             - name: Run dev server
               run: docker compose -f docker/docker-compose.staging.yaml up -d
-              env:
-                  STREAMTHING_SERVER_PASSWORD: ${{ secrets.STREAMTHING_SERVER_PASSWORD }}
 
             - name: Run tests
               run: bun run test

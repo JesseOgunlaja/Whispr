@@ -12,7 +12,9 @@ export async function getRoomById<T extends boolean>(
     })) as (T extends true ? Room : Omit<Room, "messages">) | null;
 }
 
-export async function createRoom(room: Omit<Room, "expiredAt" | "messages">) {
+export async function createRoom(
+    room: Omit<Room, "expiredAt" | "messages" | "lastActive">,
+) {
     return await db.insert(rooms).values(room).returning({ id: rooms.id });
 }
 

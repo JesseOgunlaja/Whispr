@@ -1,4 +1,3 @@
-import { AuthError } from "@/app/api/[[...slugs]]/auth";
 import { getPrivateSigningKey } from "./keyManager";
 import { sign, verify } from "./primitives";
 import { toArrayBuffer, toBase64 } from "./utils";
@@ -35,5 +34,5 @@ export async function verifySignature(
     const payload = JSON.stringify({ window, roomId });
 
     const isValidSignature = await verify(payload, signature, publicKey);
-    if (!isValidSignature) throw new AuthError("Invalid signature");
+    if (!isValidSignature) throw new Error("Invalid signature");
 }

@@ -5,12 +5,12 @@ import { customAlphabet } from "nanoid";
 import { toast } from "sonner";
 
 export const api = treaty<App>(
-    typeof window !== "undefined" ? window.location.origin : ""
+    typeof window !== "undefined" ? window.location.origin : "",
 ).api;
 
 export function promiseToast(
     promise: Promise<{ message: string }>,
-    loadingMessage?: string
+    loadingMessage?: string,
 ) {
     toast.promise(promise, {
         loading: loadingMessage || "Loading...",
@@ -29,7 +29,7 @@ export function formatMessageDate(date: Date) {
 
 export const nanoid = customAlphabet(
     "0123456789abcdefghijklmnopqrstuvwxyz",
-    15
+    15,
 );
 
 export function formatTTL(seconds: number) {
@@ -45,4 +45,11 @@ export function isLikelyBase64Key(key: string) {
         key.length <= 100 &&
         /^[A-Za-z0-9+/=]+$/.test(key)
     );
+}
+
+export function isKeyof<T extends object>(
+    key: string,
+    obj: T,
+): key is Extract<keyof T, string> {
+    return key in obj;
 }

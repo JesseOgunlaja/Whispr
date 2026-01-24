@@ -1,13 +1,13 @@
 import { useToastMutation } from "@/hooks/useToastMutation";
 import { getPublicKeys } from "@/lib/crypto/keyManager";
+import { Room } from "@/lib/db/schema";
 import { api } from "@/lib/lib";
-import { BackendError } from "@/lib/types";
+import { BackendError, SetRoom } from "@/lib/types";
+import { produce } from "immer";
 import { useRouter } from "next/navigation";
-import { useRoom } from "../_components/RoomProvider";
 
-export function useJoinRoom() {
+export function useJoinRoom(room: Room, setRoom: SetRoom) {
     const router = useRouter();
-    const { room, setRoom } = useRoom();
 
     return useToastMutation(
         {
@@ -19,12 +19,7 @@ export function useJoinRoom() {
 
                 const { data, error } = await api.room
                     .join({ roomId: room.id })
-                    .post(null, {
-                        query: {
-                            encryptionKey,
-                            signingKey,
-                        },
-                    });
+                    .post({ encryptionKey, signingKey });
 
                 if (!data?.room || error) {
                     const parsedError = error?.value as BackendError;
@@ -43,10 +38,15 @@ export function useJoinRoom() {
                 };
             },
             onError: () => router.push("/"),
-            onSuccess: (data) => {
-                setRoom(data.room);
+            onSuccess: ({ room }) => {
+                setRoom((old) =>
+                    produce(old, (draft) => {
+                        draft.users = room.users;
+                        draft.publicKeys = room.publicKeys;
+                    }),
+                );
             },
         },
-        "Joining room..."
+        "Joining room...",
     );
 }

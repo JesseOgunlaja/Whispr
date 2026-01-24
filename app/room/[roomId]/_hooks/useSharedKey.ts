@@ -10,13 +10,11 @@ export function useSharedKey() {
     const otherPublicKey =
         otherUserId && room.publicKeys[otherUserId]?.encryptionKey;
 
-    const { data } = useQuery({
-        queryKey: ["shared-key", room?.id, otherPublicKey],
-        queryFn: () => {
-            return getSharedEncryptionKey(otherPublicKey!, room!.id);
-        },
+    const { data: sharedKey } = useQuery({
+        queryKey: ["shared-key", room.id, otherPublicKey],
+        queryFn: () => getSharedEncryptionKey(otherPublicKey!, room.id),
         enabled: !!otherPublicKey,
     });
 
-    return data;
+    return sharedKey;
 }

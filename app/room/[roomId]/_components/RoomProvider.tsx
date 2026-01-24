@@ -2,8 +2,9 @@
 
 import { useStrictContext } from "@/hooks/useStrictContext";
 import { Room } from "@/lib/db/schema";
-import { ChildrenProps } from "@/lib/types";
-import { createContext, Dispatch, SetStateAction, useState } from "react";
+import { ChildrenProps, SetRoom } from "@/lib/types";
+import { createContext, useState } from "react";
+import { useRoomJoiner } from "../_hooks/useRoomJoiner";
 
 interface PropsType extends ChildrenProps {
     room: Room;
@@ -11,7 +12,7 @@ interface PropsType extends ChildrenProps {
 
 const RoomContext = createContext<{
     room: Room;
-    setRoom: Dispatch<SetStateAction<Room>>;
+    setRoom: SetRoom;
 } | null>(null);
 export const useRoom = () => useStrictContext(RoomContext);
 
@@ -20,6 +21,7 @@ export default function RoomProvider({
     room: initialRoom,
 }: PropsType) {
     const [room, setRoom] = useState(initialRoom);
+    useRoomJoiner(room, setRoom);
 
     return (
         <RoomContext.Provider value={{ room, setRoom }}>

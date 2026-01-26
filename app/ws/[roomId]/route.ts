@@ -26,7 +26,6 @@ export async function UPGRADE(
     { params: { roomId } }: RouteContext<"/ws/[roomId]">,
 ) {
     const userId = await authenticate(request, roomId).catch((error) => {
-        console.log(error);
         client.send(
             JSON.stringify({
                 type: "error",
@@ -76,9 +75,7 @@ export async function UPGRADE(
                 break;
             case "room-deleted":
                 tryCatch(client, async () => {
-                    console.time("delete room");
                     await deleteRoom(roomId);
-                    console.timeEnd("delete room");
 
                     publish(roomId, {
                         type: "room-destroyed",

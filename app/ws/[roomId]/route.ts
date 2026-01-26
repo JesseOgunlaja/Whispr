@@ -1,5 +1,5 @@
 import { createMessage, deleteRoom } from "@/lib/db/dal";
-import { messageRatelimit, ratelimit } from "@/lib/ratelimit";
+import { globalRatelimit, messageRatelimit, ratelimit } from "@/lib/ratelimit";
 import { RouteContext } from "next-ws/server";
 import { NextRequest } from "next/server";
 import { WebSocket, WebSocketServer } from "ws";
@@ -25,17 +25,10 @@ export async function UPGRADE(
     request: NextRequest,
     { params: { roomId } }: RouteContext<"/ws/[roomId]">,
 ) {
-    const userId = await authenticate(request, roomId).catch((error) => {
-        client.send(
-            JSON.stringify({
-                type: "error",
-                message:
-                    error instanceof Error ? error.message : "Unauthorized",
-            }),
-        );
-        client.close();
+    const userId = await tryCatch(client, async () => {
+        await ratelimit(globalRatelimit, request);
+        return authenticate(request, roomId);
     });
-
     if (!userId) return;
 
     const sp = Object.fromEntries(request.nextUrl.searchParams.entries());

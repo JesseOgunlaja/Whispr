@@ -78,9 +78,12 @@ export function parseRawData(raw: WebSocket.RawData) {
     return raw.toString("utf-8");
 }
 
-export async function tryCatch(socket: WebSocket, fn: () => Promise<void>) {
+export async function tryCatch<T>(
+    socket: WebSocket,
+    fn: () => Promise<T>,
+): Promise<T | undefined> {
     try {
-        await fn();
+        return await fn();
     } catch (error) {
         socket.send(
             JSON.stringify({

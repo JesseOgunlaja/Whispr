@@ -12,9 +12,8 @@ export default function MessagesList() {
     const messages = useDecryptMessages();
 
     useEffect(() => {
-        chatRef.current?.scrollTo({
-            top: chatRef.current.scrollHeight,
-        });
+        const parent = chatRef.current?.parentElement;
+        parent?.scrollTo({ top: parent.scrollHeight });
     }, [messages.length]);
 
     return (

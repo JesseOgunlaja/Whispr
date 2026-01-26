@@ -25,7 +25,7 @@ export default function SendMessage() {
         }
     }
 
-    const isFormDisabled = room?.users.length !== 2 || !sharedKey;
+    const isFormDisabled = room.users.length !== 2 || !sharedKey;
 
     return (
         <footer>
@@ -34,11 +34,9 @@ export default function SendMessage() {
                     disabled={isFormDisabled}
                     autoFocus
                     placeholder={
-                        room?.users.length === 2
+                        room.users.length === 2
                             ? "Send a message"
-                            : !room?.users.length
-                              ? "Loading"
-                              : "Waiting for second user to join"
+                            : "Waiting for second user to join"
                     }
                     type="text"
                     value={message}

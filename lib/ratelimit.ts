@@ -47,13 +47,19 @@ export const roomRatelimit = new Ratelimit({
     prefix: "room-ratelimit",
 });
 
+const RATELIMITS = {
+    global: globalRatelimit,
+    message: messageRatelimit,
+    room: roomRatelimit,
+} as const;
+
 export async function ratelimit(
-    ratelimit: Ratelimit,
+    ratelimit: keyof typeof RATELIMITS,
     request: Request,
     key?: string,
 ) {
     const ip = getClientIp(request);
     if (!ip) throw new ParseError(Error("Failed to get client IP"));
 
-    await ratelimit.limit(key ? `${ip}:${key}` : ip);
+    await RATELIMITS[ratelimit].limit(key ? `${ip}:${key}` : ip);
 }

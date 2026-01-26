@@ -1,4 +1,4 @@
-import { globalRatelimit, ratelimit, RatelimitError } from "@/lib/ratelimit";
+import { ratelimit, RatelimitError } from "@/lib/ratelimit";
 import { Elysia } from "elysia";
 import { AuthError } from "./auth";
 import { startRoomCleanup } from "./cleanup";
@@ -31,7 +31,7 @@ export const app = new Elysia({ prefix: "/api" })
         }
     })
     .derive({ as: "global" }, async ({ request }) => {
-        await ratelimit(globalRatelimit, request);
+        await ratelimit("global", request);
     })
     .use(users)
     .use(rooms);

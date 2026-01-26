@@ -1,6 +1,6 @@
 import { createRoom, getRoomById, updateRoom } from "@/lib/db/dal";
 import { nanoid } from "@/lib/lib";
-import { ratelimit, roomRatelimit } from "@/lib/ratelimit";
+import { ratelimit } from "@/lib/ratelimit";
 import { Elysia, t } from "elysia";
 import { AuthError, loadUser } from "./auth";
 
@@ -13,7 +13,7 @@ export const rooms = new Elysia({ prefix: "/room" })
         }),
     })
     .post("/create", async ({ body, userId, request }) => {
-        await ratelimit(roomRatelimit, request);
+        await ratelimit("room", request);
 
         const roomId = nanoid();
         const { encryptionKey, signingKey } = body;

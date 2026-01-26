@@ -1,5 +1,5 @@
 import { createMessage, deleteRoom } from "@/lib/db/dal";
-import { globalRatelimit, messageRatelimit, ratelimit } from "@/lib/ratelimit";
+import { ratelimit } from "@/lib/ratelimit";
 import { RouteContext } from "next-ws/server";
 import { NextRequest } from "next/server";
 import { WebSocket, WebSocketServer } from "ws";
@@ -26,7 +26,7 @@ export async function UPGRADE(
     { params: { roomId } }: RouteContext<"/ws/[roomId]">,
 ) {
     const userId = await tryCatch(client, async () => {
-        await ratelimit(globalRatelimit, request);
+        await ratelimit("global", request);
         return authenticate(request, roomId);
     });
     if (!userId) return;
@@ -52,7 +52,7 @@ export async function UPGRADE(
             case "message":
                 tryCatch(client, async () => {
                     const { ciphertext, iv } = data;
-                    await ratelimit(messageRatelimit, request, roomId);
+                    await ratelimit("message", request, roomId);
                     const message = await createMessage({
                         iv,
                         roomId,

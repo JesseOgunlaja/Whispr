@@ -4,13 +4,13 @@ import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 export function useToastMutation<
     TVariables = void,
     TData extends { message: string } = { message: string },
-    TContext = unknown
+    TContext = unknown,
 >(
     mutateOptions: UseMutationOptions<TData, unknown, TVariables, TContext>,
-    loadingMessage?: string
+    loadingMessage?: string,
 ) {
     const mutation = useMutation<TData, unknown, TVariables, TContext>(
-        mutateOptions
+        mutateOptions,
     );
 
     return {
@@ -20,7 +20,7 @@ export function useToastMutation<
         ) => {
             promiseToast(
                 mutation.mutateAsync(args[0] as TVariables),
-                loadingMessage
+                loadingMessage,
             );
         },
     };

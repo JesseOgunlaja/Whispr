@@ -3,7 +3,7 @@ import { toArrayBuffer, toBase64 } from "./utils";
 
 export async function getSharedEncryptionKey(
     otherRawPublicKey: string,
-    roomId: string
+    roomId: string,
 ) {
     const privateKey = await getPrivateEncryptionKey();
 
@@ -15,7 +15,7 @@ export async function getSharedEncryptionKey(
             namedCurve: "P-256",
         },
         false,
-        []
+        [],
     );
 
     const rawSharedKey = await crypto.subtle.deriveBits(
@@ -24,7 +24,7 @@ export async function getSharedEncryptionKey(
             public: otherPublicKey,
         },
         privateKey,
-        256
+        256,
     );
 
     const hkdfBasedSharedKey = await crypto.subtle.importKey(
@@ -32,7 +32,7 @@ export async function getSharedEncryptionKey(
         rawSharedKey,
         "HKDF",
         false,
-        ["deriveKey"]
+        ["deriveKey"],
     );
 
     const sharedChatKey = await crypto.subtle.deriveKey(
@@ -45,7 +45,7 @@ export async function getSharedEncryptionKey(
         hkdfBasedSharedKey,
         { name: "AES-GCM", length: 256 },
         false,
-        ["encrypt", "decrypt"]
+        ["encrypt", "decrypt"],
     );
 
     return sharedChatKey;
@@ -58,7 +58,7 @@ export async function encryptMessage(sharedKey: CryptoKey, message: string) {
     const ciphertext = await crypto.subtle.encrypt(
         { name: "AES-GCM", iv },
         sharedKey,
-        encoded
+        encoded,
     );
 
     return {
@@ -70,7 +70,7 @@ export async function encryptMessage(sharedKey: CryptoKey, message: string) {
 export async function decryptMessage(
     sharedKey: CryptoKey,
     ciphertextBase64: string,
-    ivBase64: string
+    ivBase64: string,
 ) {
     const iv = toArrayBuffer(ivBase64);
     const ciphertext = toArrayBuffer(ciphertextBase64);
@@ -78,7 +78,7 @@ export async function decryptMessage(
     const decrypted = await crypto.subtle.decrypt(
         { name: "AES-GCM", iv },
         sharedKey,
-        ciphertext
+        ciphertext,
     );
 
     return new TextDecoder().decode(decrypted);

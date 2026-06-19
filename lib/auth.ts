@@ -6,7 +6,7 @@ const secret = new TextEncoder().encode(env.JWT_SIGNING_KEY);
 
 export async function signJWT(
     payload: Record<string, unknown>,
-    duration = "30d"
+    duration = "30d",
 ) {
     return await new SignJWT(payload)
         .setProtectedHeader({ alg: "HS256" })

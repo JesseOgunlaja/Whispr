@@ -9,9 +9,9 @@ RUN BUN_INSTALL_CACHE=/tmp/bun_cache bun ci && rm -rf /tmp/bun_cache
 COPY . .
 
 ENV \
-  DATABASE_URL=dummy \
-  JWT_SIGNING_KEY=dummy \
-  REDIS_PASSWORD=dummy
+    DATABASE_URL=dummy \
+    JWT_SIGNING_KEY=dummy \
+    REDIS_PASSWORD=dummy
 
 RUN bun run build
 

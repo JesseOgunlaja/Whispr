@@ -18,7 +18,7 @@ export async function loadPrivateSigningKey() {
 
 export async function saveSigningKeys(
     publicKey: CryptoKey,
-    privateKey: CryptoKey
+    privateKey: CryptoKey,
 ) {
     const db = await getDB();
     await db.put("signing-keys", publicKey, "public");
@@ -41,7 +41,7 @@ export async function loadPrivateEncryptionKey() {
 
 export async function saveEncryptionKeys(
     publicKey: CryptoKey,
-    privateKey: CryptoKey
+    privateKey: CryptoKey,
 ) {
     const db = await getDB();
     await db.put("encryption-keys", publicKey, "public");

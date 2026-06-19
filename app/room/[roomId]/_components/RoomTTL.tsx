@@ -10,7 +10,7 @@ export default function RoomTTL() {
     const router = useRouter();
     const { room } = useRoom();
     const [ttl, setTTL] = useState(() =>
-        Math.floor((room.expiredAt.getTime() - Date.now()) / 1000)
+        Math.floor((room.expiredAt.getTime() - Date.now()) / 1000),
     );
 
     useEffect(() => {

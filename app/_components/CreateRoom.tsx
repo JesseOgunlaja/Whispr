@@ -32,7 +32,7 @@ export default function CreateRoom() {
             },
             onSuccess: ({ roomId }) => router.push(`/room/${roomId}`),
         },
-        "Creating room..."
+        "Creating room...",
     );
 
     return (

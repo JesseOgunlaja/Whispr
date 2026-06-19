@@ -8,7 +8,7 @@ export async function generateSigningKeys() {
             namedCurve: "P-256",
         },
         false,
-        ["sign", "verify"]
+        ["sign", "verify"],
     );
 
     await saveSigningKeys(publicKey, privateKey);
@@ -19,20 +19,20 @@ export async function sign(payload: string, privateKey: CryptoKey) {
     return await crypto.subtle.sign(
         { name: "ECDSA", hash: "SHA-256" },
         privateKey,
-        new TextEncoder().encode(payload)
+        new TextEncoder().encode(payload),
     );
 }
 
 export async function verify(
     payload: string,
     signature: string,
-    publicKey: CryptoKey
+    publicKey: CryptoKey,
 ) {
     return await crypto.subtle.verify(
         { name: "ECDSA", hash: "SHA-256" },
         publicKey,
         toArrayBuffer(signature),
-        new TextEncoder().encode(payload)
+        new TextEncoder().encode(payload),
     );
 }
 
@@ -43,7 +43,7 @@ export async function generateEncryptionKeys() {
             namedCurve: "P-256",
         },
         false,
-        ["deriveKey", "deriveBits"]
+        ["deriveKey", "deriveBits"],
     );
 
     await saveEncryptionKeys(publicKey, privateKey);

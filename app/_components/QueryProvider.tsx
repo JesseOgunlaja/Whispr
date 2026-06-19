@@ -13,7 +13,7 @@ export default function QueryProvider({ children }: ChildrenProps) {
                         refetchOnWindowFocus: false,
                     },
                 },
-            })
+            }),
     );
 
     return (

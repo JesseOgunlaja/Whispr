@@ -9,7 +9,7 @@ export default function RoomID() {
 
     function copyRoomId() {
         navigator.clipboard.writeText(
-            `${window.location.origin}/room/${room.id}`
+            `${window.location.origin}/room/${room.id}`,
         );
 
         setCopied(true);

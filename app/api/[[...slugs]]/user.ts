@@ -9,5 +9,5 @@ export const users = new Elysia({ prefix: "/user" }).post(
         cookie.token.set(getTokenCookieConfig(await signJWT({ userId })));
 
         return { userId };
-    }
+    },
 );

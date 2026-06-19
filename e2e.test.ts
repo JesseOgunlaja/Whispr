@@ -39,7 +39,7 @@ test("two users send messages and destroy room", async () => {
 
     expect(
         "http://localhost:3000/",
-        "http://localhost:3000/?info=Room%20destroyed"
+        "http://localhost:3000/?info=Room%20destroyed",
     ).toContain(user1.url());
     expect(user2.url()).toBe("http://localhost:3000/");
 
